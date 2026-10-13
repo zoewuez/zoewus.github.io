@@ -260,38 +260,6 @@
   }
 
   /* ---------- Temperature slider ---------- */
-  .slider-panel {
-    position: relative;
-    overflow: hidden;
-    border-radius: 18px;
-    background: linear-gradient(120deg, rgba(74, 109, 156, 0.09), rgba(181, 82, 74, 0.08));
-    border: 1px solid rgba(74, 109, 156, 0.22);
-    padding: 22px 26px 16px;
-    margin-bottom: 20px;
-  }
-
-  .slider-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-  }
-
-  .slider-head label {
-    font-size: 15px;
-    font-weight: 700;
-  }
-
-  .lambda-value {
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--blue);
-  }
-
-  .lambda-value em { font-style: italic; }
-
   input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
@@ -350,11 +318,18 @@
   }
 
   /* ---------- Quantitative results (SD plot) ---------- */
-  .plots {
-    max-width: 640px;
-    margin: 36px auto 0;
+  /* Samples card and plot card side by side, a little wider than the text column. */
+  .sd-layout {
+    display: grid;
+    grid-template-columns: 1.08fr 1fr;
+    gap: 22px;
+    align-items: stretch;
+    width: min(1200px, 94vw);
+    margin-left: calc(50% - min(600px, 47vw));
   }
   .plot-card {
+    display: flex;
+    flex-direction: column;
     padding: 18px 20px 14px;
     border-radius: 18px;
     background: #fff;
@@ -369,13 +344,14 @@
   .plot-card svg .grid { stroke: #ebebeb; stroke-width: 1; }
   .plot-card svg .axis { stroke: #c3c2b7; stroke-width: 1; }
   .plot-card svg circle { transition: r 0.2s ease; }
-  .plot-control { display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px; }
+  .plot-control { display: flex; justify-content: space-between; align-items: baseline; margin-top: auto; padding-top: 12px; }
+  .plot-control .val em { font-style: italic; }
   .plot-control label { font-size: 14px; font-weight: 700; white-space: nowrap; }
   .plot-control .val { font-size: 20px; font-weight: 700; color: var(--blue); }
   .plot-card .ticks { margin-bottom: 4px; }
   .plot-legend {
     display: flex; flex-wrap: wrap; gap: 6px 16px;
-    font-size: 13px; color: var(--muted); margin-top: 8px;
+    font-size: 13px; color: var(--muted); margin-top: 4px; justify-content: center;
   }
   .plot-legend span { display: inline-flex; align-items: center; gap: 6px; }
   .plot-legend i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; }
@@ -408,18 +384,22 @@
   /* Rows: single chain vs STEER; columns: prompts. */
   .sd-grid {
     display: grid;
-    grid-template-columns: 96px repeat(3, 1fr);
+    grid-template-columns: 20px repeat(3, 1fr);
     gap: 10px;
-    max-width: 960px;
-    margin: 0 auto;
+    margin: 6px 0 4px;
     align-items: center;
   }
   .sd-label {
     grid-column: 1;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--tsr);
-    line-height: 1.3;
+    line-height: 1;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    justify-self: center;
   }
   .sd-label.steer { color: var(--steer); }
   .sd-label span { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
@@ -521,8 +501,9 @@
 
   /* ---------- Responsive ---------- */
   @media (max-width: 720px) {
-    .sd-grid { grid-template-columns: 64px repeat(3, 1fr); gap: 5px; }
-    .sd-label { font-size: 12px; }
+    .sd-layout { grid-template-columns: 1fr; width: auto; margin-left: 0; }
+    .sd-grid { grid-template-columns: 16px repeat(3, 1fr); gap: 5px; }
+    .sd-label { font-size: 11px; }
     .sd-grid a { border-width: 2px; border-radius: 6px; }
     .maze-grid { grid-template-columns: 1fr; gap: 14px; }
     h1.project { font-size: 34px; width: auto; margin: 0 0 22px; white-space: normal; }
@@ -721,37 +702,38 @@
     allowing low-temperature sampling that stays sharp without sacrificing semantic fidelity.
   </p>
 
-  <div class="slider-panel">
-    <div class="slider-head">
-      <label for="lambda">Temperature &lambda;</label>
-      <div class="lambda-value"><em>&lambda;</em> = <span id="lambda-out">0.95</span></div>
+  <!-- ============ SAMPLES + QUANTITATIVE PLOT (side by side) ============ -->
+  <div class="sd-layout">
+    <div class="plot-card sample-card">
+      <h3>Stable Diffusion samples</h3>
+      <p class="plot-sub">Single chain vs. STEER with 4 replicas, same prompts</p>
+      <div class="sd-grid" id="sd-grid">
+        <div class="sd-label">Single chain</div>
+        <div class="sd-label steer">STEER</div>
+      </div>
+      <div class="plot-control">
+        <label for="lambda">Temperature</label>
+        <span class="val"><em>&lambda;</em> = <span id="lambda-out">0.95</span></span>
+      </div>
+      <input type="range" id="lambda" min="0" max="4" step="1" value="0">
+      <div class="ticks" id="ticks"></div>
     </div>
-    <input type="range" id="lambda" min="0" max="4" step="1" value="0">
-    <div class="ticks" id="ticks"></div>
-  </div>
 
-  <div class="sd-grid" id="sd-grid">
-    <div class="sd-label">Single chain</div>
-    <div class="sd-label steer">STEER<span>4 replicas</span></div>
-  </div>
-
-  <!-- ============ QUANTITATIVE PLOTS ============ -->
-  <div class="plots">
     <div class="plot-card">
-      <h3>Stable Diffusion</h3>
-      <p class="plot-sub">FID vs. CLIP score across temperatures &lambda; (down and right is better)</p>
+      <h3>Fidelity vs. prompt alignment</h3>
+      <p class="plot-sub">FID vs. CLIP score across &lambda;; down and right is better</p>
       <svg id="sd-plot" viewBox="0 0 480 340" role="img" aria-label="FID versus CLIP score for single chain and STEER"></svg>
+      <div class="plot-legend">
+        <span><i class="dash" style="border-color:#9a9a9a"></i>Single chain</span>
+        <span><i style="border-color:var(--red)"></i>STEER</span>
+        <span id="sd-lambda-legend"></span>
+      </div>
       <div class="plot-control">
         <label for="nrep">STEER replicas</label>
         <span class="val" id="nrep-out">4</span>
       </div>
       <input type="range" id="nrep" min="0" max="3" step="1" value="1">
       <div class="ticks" id="nrep-ticks"></div>
-      <div class="plot-legend">
-        <span><i class="dash" style="border-color:#9a9a9a"></i>Single chain</span>
-        <span><i style="border-color:var(--red)"></i>STEER</span>
-        <span id="sd-lambda-legend"></span>
-      </div>
     </div>
 
   </div>
@@ -839,7 +821,7 @@
     { lambda: '0.98', key: '0_98', orig: '098' },
     { lambda: '1.02', key: '1_02', orig: '102' },
     { lambda: '1.05', key: '1_05', orig: '105' },
-    { lambda: '1.1',  key: '1_1',  orig: '11' }
+    { lambda: '1.10', key: '1_1',  orig: '11' }
   ];
 
   var slider = document.getElementById('lambda');
@@ -881,6 +863,7 @@
     var i = +slider.value;
     var t = TEMPS[i];
     out.textContent = t.lambda;
+    document.dispatchEvent(new CustomEvent('lambdachange', { detail: i }));
     Array.prototype.forEach.call(ticks.children, function (b, j) {
       b.classList.toggle('active', j === i);
     });
@@ -1011,11 +994,17 @@
     for (var k = 0; k < pts.length - 1; k++) {
       path(g, [pts[k], pts[k + 1]], { stroke: lamColor((LAMBDAS[k] + LAMBDAS[k + 1]) / 2), 'stroke-width': 3 });
     }
+    // Ring the points at the temperature chosen on the samples slider.
+    [base[lamIdx], pts[lamIdx]].forEach(function (p) {
+      el(g, 'circle', { cx: p[0], cy: p[1], r: 11, fill: 'none', stroke: lamColor(LAMBDAS[lamIdx]), 'stroke-width': 2.5, opacity: 0.6 });
+    });
     pts.forEach(function (p, k) {
       var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 6, fill: lamColor(LAMBDAS[k]), stroke: '#0b0b0b', 'stroke-width': 1 });
       el(c, 'title', {}, 'STEER (' + n + ' replicas), \u03bb ' + LAMBDAS[k].toFixed(2) + ': CLIP ' + SD[n].clip[k].toFixed(2) + ', FID ' + SD[n].fid[k].toFixed(2));
     });
   }
+  var lamIdx = +document.getElementById('lambda').value;
+  document.addEventListener('lambdachange', function (e) { lamIdx = e.detail; drawSD(); });
   nrep.addEventListener('input', drawSD);
   drawSD();
 
