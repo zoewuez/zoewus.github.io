@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400..700&family=IBM+Plex+Mono:wght@400;600&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --text: #1d1f26;
@@ -81,12 +81,12 @@
   }
 
   h1.project {
-    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: min(60px, 3.8vw);
-    font-weight: 700;
+    font-family: 'Google Sans', 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: min(64px, 4.8vw);
+    font-weight: 500;
     line-height: 1.12;
-    letter-spacing: -0.02em;
-    /* Wider than the container so "...Diffusion Sampling" fits on the first line. */
+    letter-spacing: -0.01em;
+    /* Wider than the container so each line stays on one line. */
     width: 94vw;
     margin: 0 0 22px calc(50% - 47vw);
     white-space: nowrap;
@@ -104,14 +104,14 @@
   }
 
   .meta {
-    font-size: 15px;
+    font-size: 21px;
     color: var(--muted);
   }
 
   .meta .author { color: inherit; }
 
   .affiliation {
-    font-size: 15px;
+    font-size: 19px;
     color: var(--muted);
     margin-top: 2px;
   }
@@ -206,23 +206,19 @@
   /* Abstract: one full screen on a dark brown band. */
   .band-abstract {
     display: flow-root;
-    background: #2a1512;
-    color: #f5efe8;
     border-bottom: 1px solid rgba(30, 45, 70, 0.18);
   }
   .abstract-page { padding: 48px 0 8px; }
   .abstract-page h2.section-title { margin-top: 0; }
   .band-abstract .lede {
     font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
-    color: rgba(245, 239, 232, 0.9);
     font-size: 15.5px;
     line-height: 1.8;
   }
   .band-abstract .abstract-link { color: inherit; }
-  .band-abstract .abstract-link:hover strong { text-decoration-color: #fff; }
+  .band-abstract .abstract-link:hover strong { text-decoration-color: var(--red); }
   .band-abstract .lede strong {
     font-weight: 600;
-    color: #fff;
     text-decoration: underline;
     text-decoration-color: rgba(222, 120, 104, 0.85);
     text-decoration-thickness: 2px;
@@ -519,7 +515,7 @@
 
   <!-- ============ TITLE ============ -->
   <div class="title-block">
-    <h1 class="project">Diverse Low-Temperature Diffusion Sampling<br>through Replica Exchange</h1>
+    <h1 class="project">Diverse Low-Temperature Diffusion<br>Sampling through Replica Exchange</h1>
     <div class="meta">
       <span class="author">Zoe Wu</span>, Haldun Balim, Yilun Du &middot; Under Review
     </div>
