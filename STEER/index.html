@@ -406,8 +406,6 @@
     transition: transform 0.3s ease;
   }
   .sd-grid a:hover img { transform: scale(1.04); }
-  .sd-grid a.missing { pointer-events: none; background: #eceef3; }
-  .sd-grid a.missing img { visibility: hidden; }
 
   .section-intro {
     font-size: 15.5px;
@@ -780,8 +778,7 @@
   var SCENES = [
     { id: 'skateboard_1176', orig: 'skateboard_1176',              name: 'skateboard' },
     { id: 'coco_544',        orig: 'COCO_val2014_000000000544',    name: 'COCO 544' },
-    // No single-chain sample at λ 0.95 for this prompt.
-    { id: 'coco_581206',     orig: 'COCO_val2014_000000581206',    name: 'COCO 581206', missing: ['tsr_0_95'] }
+    { id: 'coco_581206',     orig: 'COCO_val2014_000000581206',    name: 'COCO 581206' }
   ];
   var TEMPS = [
     { lambda: '0.95', key: '0_95', orig: '095' },
@@ -837,7 +834,6 @@
       row.forEach(function (c) {
         c.a.href = '../images/steer_tsr/' + encodeURIComponent(c.method + ' ' + t.orig) + '/' + c.scene.orig + '.png';
         c.img.src = '../images/steer_web/' + c.method + '_' + t.key + '/' + c.scene.id + '.jpg';
-        c.a.classList.toggle('missing', (c.scene.missing || []).indexOf(c.method + '_' + t.key) >= 0);
         c.img.alt = c.label + ' sample, ' + c.scene.name + ', lambda ' + t.lambda;
       });
     });
