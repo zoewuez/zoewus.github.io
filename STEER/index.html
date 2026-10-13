@@ -48,10 +48,10 @@
   a:hover { color: var(--red); }
 
   /* ---------- Cream band (abstract + How it works) ---------- */
+  /* Everything between the title band and continuous control shares one light cream. */
   .band-cream {
     display: flow-root;
-    background: #f7f1e3;
-    border-bottom: 1px solid rgba(30, 45, 70, 0.18);
+    background: #fcf9f2;
   }
   .container.top { padding-top: 0; padding-bottom: 44px; }
 
@@ -173,8 +173,7 @@
     align-items: center;
     justify-content: center;
     padding: 28px 24px;
-    background: #fff;
-    border-bottom: 1px solid rgba(30, 45, 70, 0.18);
+    background: #fcf9f2;
   }
   .framework-band img {
     display: block;
@@ -183,12 +182,6 @@
     height: auto;
   }
 
-  .band-dark {
-    display: flow-root;
-    background: #2a1512;
-    color: #f5efe8;
-    border-bottom: 1px solid rgba(30, 45, 70, 0.18);
-  }
 
   /* Abstract: a card at the top of the blue "How it works" band. */
   .abstract-page { padding: 48px 0 0; }
@@ -672,8 +665,8 @@
 </div>
 </div>
 
-<!-- ============ GLOBAL SEARCH + EXCHANGES (dark red band) ============ -->
-<div class="band-dark">
+<!-- ============ GLOBAL SEARCH + EXCHANGES ============ -->
+<div class="band-cream">
 <div class="container top">
 
   <h2 class="section-title" id="global-search">STEER finds isolated modes that a single chain misses</h2>
@@ -689,6 +682,7 @@
 </div>
 </div>
 
+<div class="band-cream">
 <div class="container">
   <!-- ============ SAMPLES ============ -->
   <h2 class="section-title" id="per-sample-fidelity">STEER enhances per-sample fidelity</h2>
@@ -734,6 +728,7 @@
 
   </div>
 
+</div>
 </div>
 
 <!-- ============ CONTINUOUS CONTROL ============ -->
