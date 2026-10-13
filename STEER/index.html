@@ -349,6 +349,39 @@
     font-weight: 700;
   }
 
+  /* ---------- Quantitative results (SD plot) ---------- */
+  .plots {
+    max-width: 640px;
+    margin: 36px auto 0;
+  }
+  .plot-card {
+    padding: 18px 20px 14px;
+    border-radius: 18px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px -18px rgba(30, 45, 70, 0.3);
+  }
+  .plot-card h3 { font-size: 19px; font-weight: 700; margin: 0 0 2px; }
+  .plot-card .plot-sub { font-size: 13.5px; color: var(--muted); margin: 0 0 6px; }
+  .plot-card svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .plot-card svg text { font-family: inherit; fill: var(--muted); font-size: 12px; }
+  .plot-card svg .axis-label { fill: var(--text); font-size: 13px; font-weight: 600; }
+  .plot-card svg .grid { stroke: #ebebeb; stroke-width: 1; }
+  .plot-card svg .axis { stroke: #c3c2b7; stroke-width: 1; }
+  .plot-card svg circle { transition: r 0.2s ease; }
+  .plot-control { display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px; }
+  .plot-control label { font-size: 14px; font-weight: 700; white-space: nowrap; }
+  .plot-control .val { font-size: 20px; font-weight: 700; color: var(--blue); }
+  .plot-card .ticks { margin-bottom: 4px; }
+  .plot-legend {
+    display: flex; flex-wrap: wrap; gap: 6px 16px;
+    font-size: 13px; color: var(--muted); margin-top: 8px;
+  }
+  .plot-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .plot-legend i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; }
+  .plot-legend i.dot { width: 10px; height: 10px; border: 1px solid #0b0b0b; border-radius: 50%; }
+  .plot-legend i.dash { border-top-style: dashed; }
+
   /* ---------- Continuous control (dark muted blue-purple band) ---------- */
   .band-control {
     background: #2c2b45;
@@ -702,6 +735,27 @@
     <div class="sd-label steer">STEER<span>4 replicas</span></div>
   </div>
 
+  <!-- ============ QUANTITATIVE PLOTS ============ -->
+  <div class="plots">
+    <div class="plot-card">
+      <h3>Stable Diffusion</h3>
+      <p class="plot-sub">FID vs. CLIP score across temperatures &lambda; (down and right is better)</p>
+      <svg id="sd-plot" viewBox="0 0 480 340" role="img" aria-label="FID versus CLIP score for single chain and STEER"></svg>
+      <div class="plot-control">
+        <label for="nrep">STEER replicas</label>
+        <span class="val" id="nrep-out">4</span>
+      </div>
+      <input type="range" id="nrep" min="0" max="3" step="1" value="1">
+      <div class="ticks" id="nrep-ticks"></div>
+      <div class="plot-legend">
+        <span><i class="dash" style="border-color:#9a9a9a"></i>Single chain</span>
+        <span><i style="border-color:var(--red)"></i>STEER</span>
+        <span id="sd-lambda-legend"></span>
+      </div>
+    </div>
+
+  </div>
+
 </div>
 
 <!-- ============ CONTINUOUS CONTROL ============ -->
@@ -841,6 +895,131 @@
 
   slider.addEventListener('input', render);
   render();
+</script>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var GRAY = '#9a9a9a';
+
+  function el(parent, tag, attrs, text) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    parent.appendChild(e);
+    return e;
+  }
+
+  // Draws gridlines, ticks and axis labels; returns x/y scale functions.
+  function axes(svg, o) {
+    var W = 480, H = 340, L = 56, R = 14, T = 12, B = 48;
+    var sx = function (v) { return L + (v - o.x[0]) / (o.x[1] - o.x[0]) * (W - L - R); };
+    var sy = function (v) { return H - B - (v - o.y[0]) / (o.y[1] - o.y[0]) * (H - T - B); };
+    o.xt.forEach(function (v) {
+      el(svg, 'line', { class: 'grid', x1: sx(v), x2: sx(v), y1: T, y2: H - B });
+      el(svg, 'text', { x: sx(v), y: H - B + 18, 'text-anchor': 'middle' }, o.xf(v));
+    });
+    o.yt.forEach(function (v) {
+      el(svg, 'line', { class: 'grid', x1: L, x2: W - R, y1: sy(v), y2: sy(v) });
+      el(svg, 'text', { x: L - 8, y: sy(v) + 4, 'text-anchor': 'end' }, o.yf(v));
+    });
+    el(svg, 'line', { class: 'axis', x1: L, x2: W - R, y1: H - B, y2: H - B });
+    el(svg, 'line', { class: 'axis', x1: L, x2: L, y1: T, y2: H - B });
+    el(svg, 'text', { class: 'axis-label', x: (L + W - R) / 2, y: H - 8, 'text-anchor': 'middle' }, o.xl);
+    el(svg, 'text', { class: 'axis-label', x: -(T + H - B) / 2, y: 14, 'text-anchor': 'middle', transform: 'rotate(-90)' }, o.yl);
+    return { sx: sx, sy: sy, layer: el(svg, 'g', {}) };
+  }
+
+  function path(g, pts, attrs) {
+    attrs.d = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join('');
+    attrs.fill = 'none';
+    attrs['stroke-linecap'] = 'round';
+    attrs['stroke-linejoin'] = 'round';
+    return el(g, 'path', attrs);
+  }
+
+  function makeTicks(box, labels, input, onPick) {
+    labels.forEach(function (t, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = t;
+      b.addEventListener('click', function () { input.value = i; onPick(); });
+      box.appendChild(b);
+    });
+    return function (i) {
+      Array.prototype.forEach.call(box.children, function (b, j) { b.classList.toggle('active', j === i); });
+    };
+  }
+
+  // λ -> colour, blue (0.95) to red (1.10), matching the page's slider gradient.
+  function lerpHex(a, b, t) {
+    var pa = [1, 3, 5].map(function (i) { return parseInt(a.substr(i, 2), 16); });
+    var pb = [1, 3, 5].map(function (i) { return parseInt(b.substr(i, 2), 16); });
+    return 'rgb(' + pa.map(function (v, i) { return Math.round(v + (pb[i] - v) * t); }).join(',') + ')';
+  }
+
+  /* ---------------- Stable Diffusion: slider over number of replicas ---------------- */
+  var LAMBDAS = [0.95, 0.98, 1.02, 1.05, 1.10];
+  var lamColor = function (l) { return lerpHex('#4a6d9c', '#b5524a', (l - 0.95) / 0.15); };
+  var SD = {
+    1: { fid: [28.7777, 27.5355, 26.1332, 25.4052, 25.0400], clip: [31.7595, 31.7754, 31.8234, 31.8905, 32.0687] },
+    2: { fid: [29.2921, 28.3221, 27.0750, 26.5571, 26.2556], clip: [31.6326, 31.6516, 31.7518, 31.8578, 32.1015] },
+    4: { fid: [27.1152, 26.0531, 25.1746, 24.8285, 25.0876], clip: [31.7575, 31.7858, 31.8601, 31.9497, 32.1579] },
+    6: { fid: [26.6256, 24.8160, 23.8856, 23.8553, 24.5237], clip: [31.8453, 31.8292, 31.9598, 32.1033, 32.2761] },
+    8: { fid: [27.2014, 25.5301, 25.0762, 25.0385, 25.6385], clip: [31.7221, 31.8156, 31.9822, 32.0724, 32.3045] }
+  };
+  var NREPS = [2, 4, 6, 8];
+
+  var sdSvg = document.getElementById('sd-plot');
+  var sd = axes(sdSvg, {
+    x: [31.55, 32.4], y: [23, 30],
+    xt: [31.6, 31.8, 32.0, 32.2, 32.4], yt: [23, 24, 25, 26, 27, 28, 29, 30],
+    xf: function (v) { return v.toFixed(1); }, yf: function (v) { return v; },
+    xl: 'CLIP score (\u2191 better)', yl: 'FID (\u2193 better)'
+  });
+  var sdPts = function (n) {
+    return SD[n].clip.map(function (c, i) { return [sd.sx(c), sd.sy(SD[n].fid[i])]; });
+  };
+
+  document.getElementById('sd-lambda-legend').innerHTML = LAMBDAS.map(function (l) {
+    return '<i class="dot" style="background:' + lamColor(l) + '"></i>';
+  }).join('') + '&nbsp;&lambda; 0.95 &rarr; 1.10';
+
+  var nrep = document.getElementById('nrep');
+  var nrepOut = document.getElementById('nrep-out');
+  var nrepActive = makeTicks(document.getElementById('nrep-ticks'), NREPS, nrep, drawSD);
+
+  function drawSD() {
+    var i = +nrep.value, n = NREPS[i];
+    nrepOut.textContent = n;
+    nrepActive(i);
+    var g = sd.layer;
+    while (g.firstChild) g.removeChild(g.firstChild);
+    // Other replica counts as faint context.
+    NREPS.forEach(function (m) {
+      if (m !== n) path(g, sdPts(m), { stroke: '#e3d6d4', 'stroke-width': 1.5 });
+    });
+    // Single chain baseline.
+    var base = sdPts(1);
+    path(g, base, { stroke: GRAY, 'stroke-width': 2, 'stroke-dasharray': '6 4' });
+    base.forEach(function (p, k) {
+      var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 4.5, fill: '#d6d6d6', stroke: GRAY, 'stroke-width': 1 });
+      el(c, 'title', {}, 'Single chain, \u03bb ' + LAMBDAS[k].toFixed(2) + ': CLIP ' + SD[1].clip[k].toFixed(2) + ', FID ' + SD[1].fid[k].toFixed(2));
+    });
+    // Selected STEER curve, each segment coloured by λ.
+    var pts = sdPts(n);
+    for (var k = 0; k < pts.length - 1; k++) {
+      path(g, [pts[k], pts[k + 1]], { stroke: lamColor((LAMBDAS[k] + LAMBDAS[k + 1]) / 2), 'stroke-width': 3 });
+    }
+    pts.forEach(function (p, k) {
+      var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 6, fill: lamColor(LAMBDAS[k]), stroke: '#0b0b0b', 'stroke-width': 1 });
+      el(c, 'title', {}, 'STEER (' + n + ' replicas), \u03bb ' + LAMBDAS[k].toFixed(2) + ': CLIP ' + SD[n].clip[k].toFixed(2) + ', FID ' + SD[n].fid[k].toFixed(2));
+    });
+  }
+  nrep.addEventListener('input', drawSD);
+  drawSD();
+
+})();
 </script>
 </body>
 </html>
