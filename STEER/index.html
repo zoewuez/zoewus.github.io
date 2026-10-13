@@ -56,7 +56,7 @@
   .container.top { padding-top: 0; padding-bottom: 44px; }
 
   .band-header {
-    background: #e3e8ef;
+    background: #cdd8e6;
     border-bottom: 1px solid rgba(30, 45, 70, 0.18);
   }
   .container.header { padding-bottom: 48px; }
@@ -82,12 +82,14 @@
 
   h1.project {
     font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 60px;
+    font-size: min(60px, 3.8vw);
     font-weight: 700;
     line-height: 1.12;
     letter-spacing: -0.02em;
-    max-width: 980px;
-    margin: 0 auto 22px;
+    /* Wider than the container so "...Diffusion Sampling" fits on the first line. */
+    width: 94vw;
+    margin: 0 0 22px calc(50% - 47vw);
+    white-space: nowrap;
     background: linear-gradient(90deg, var(--blue), var(--mauve), var(--red), var(--blue));
     background-size: 300% 100%;
     -webkit-background-clip: text;
@@ -505,7 +507,7 @@
     .sd-label { font-size: 12px; }
     .sd-grid a { border-width: 2px; border-radius: 6px; }
     .maze-grid { grid-template-columns: 1fr; gap: 14px; }
-    h1.project { font-size: 34px; }
+    h1.project { font-size: 34px; width: auto; margin: 0 0 22px; white-space: normal; }
   }
 </style>
 </head>
