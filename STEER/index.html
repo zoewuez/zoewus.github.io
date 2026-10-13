@@ -89,7 +89,7 @@
     width: 94vw;
     margin: 0 0 22px calc(50% - 47vw);
     white-space: nowrap;
-    color: #7a1f1f;
+    color: #14213d;
   }
 
   .meta {
@@ -373,8 +373,10 @@
   /* Rows: single chain vs STEER; columns: prompts. */
   .sd-grid {
     display: grid;
-    grid-template-columns: 96px repeat(4, 1fr);
+    grid-template-columns: 96px repeat(2, 1fr);
     gap: 10px;
+    max-width: 760px;
+    margin: 0 auto;
     align-items: center;
   }
   .sd-label {
@@ -484,7 +486,7 @@
 
   /* ---------- Responsive ---------- */
   @media (max-width: 720px) {
-    .sd-grid { grid-template-columns: 64px repeat(4, 1fr); gap: 5px; }
+    .sd-grid { grid-template-columns: 64px repeat(2, 1fr); gap: 5px; }
     .sd-label { font-size: 12px; }
     .sd-grid a { border-width: 2px; border-radius: 6px; }
     .maze-grid { grid-template-columns: 1fr; gap: 14px; }
@@ -694,7 +696,7 @@
       <label for="lambda">Temperature &lambda;</label>
       <div class="lambda-value"><em>&lambda;</em> = <span id="lambda-out">0.95</span></div>
     </div>
-    <input type="range" id="lambda" min="0" max="2" step="1" value="0">
+    <input type="range" id="lambda" min="0" max="4" step="1" value="0">
     <div class="ticks" id="ticks"></div>
   </div>
 
@@ -775,14 +777,15 @@
   // Folder suffix in images/steer_web/ uses the temperature with "." -> "_" (e.g. steer_1_1 = λ 1.1).
   // Originals live in images/steer_tsr/ as e.g. "steer 11" for λ 1.1.
   // Only temperatures where every scene has both a TSR (single chain) and STEER sample are listed.
+  // id = web .jpg name in steer_web/, orig = full-resolution .png name in steer_tsr/.
   var SCENES = [
-    { id: 'skateboard_1176', name: 'skateboard' },
-    { id: 'bench_5820',      name: 'bench' },
-    { id: 'cow_3771',        name: 'cow' },
-    { id: 'tennis_1292',     name: 'tennis' }
+    { id: 'skateboard_1176', orig: 'skateboard_1176',              name: 'skateboard' },
+    { id: 'coco_544',        orig: 'COCO_val2014_000000000544',    name: 'COCO 544' }
   ];
   var TEMPS = [
     { lambda: '0.95', key: '0_95', orig: '095' },
+    { lambda: '0.98', key: '0_98', orig: '098' },
+    { lambda: '1.02', key: '1_02', orig: '102' },
     { lambda: '1.05', key: '1_05', orig: '105' },
     { lambda: '1.1',  key: '1_1',  orig: '11' }
   ];
@@ -831,7 +834,7 @@
     });
     cells.forEach(function (row) {
       row.forEach(function (c) {
-        c.a.href = '../images/steer_tsr/' + encodeURIComponent(c.method + ' ' + t.orig) + '/' + c.scene.id + '.png';
+        c.a.href = '../images/steer_tsr/' + encodeURIComponent(c.method + ' ' + t.orig) + '/' + c.scene.orig + '.png';
         c.img.src = '../images/steer_web/' + c.method + '_' + t.key + '/' + c.scene.id + '.jpg';
         c.img.alt = c.label + ' sample, ' + c.scene.name + ', lambda ' + t.lambda;
       });
