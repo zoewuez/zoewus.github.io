@@ -312,7 +312,7 @@
   /* Samples card and plot card side by side, spanning the text column. */
   .sd-layout {
     display: grid;
-    grid-template-columns: 1.08fr 1fr;
+    grid-template-columns: 1.5fr 1fr;
     gap: 20px;
     align-items: stretch;
   }
@@ -328,8 +328,8 @@
   .plot-card h3 { font-size: 19px; font-weight: 700; margin: 0 0 2px; }
   .plot-card .plot-sub { font-size: 13.5px; color: var(--muted); margin: 0 0 6px; }
   .plot-card svg { display: block; width: 100%; height: auto; overflow: visible; }
-  .plot-card svg text { font-family: inherit; fill: var(--muted); font-size: 12px; }
-  .plot-card svg .axis-label { fill: var(--text); font-size: 13px; font-weight: 600; }
+  .plot-card svg text { font-family: inherit; fill: var(--muted); font-size: 13.5px; }
+  .plot-card svg .axis-label { fill: var(--text); font-size: 14.5px; font-weight: 600; }
   .plot-card svg .grid { stroke: #ebebeb; stroke-width: 1; }
   .plot-card svg .axis { stroke: #c3c2b7; stroke-width: 1; }
   .plot-card svg circle { transition: r 0.2s ease; }
@@ -712,7 +712,7 @@
     <div class="plot-card">
       <h3>Fidelity vs. prompt alignment</h3>
       <p class="plot-sub">FID vs. CLIP score across &lambda;; down and right is better</p>
-      <svg id="sd-plot" viewBox="0 0 480 340" role="img" aria-label="FID versus CLIP score for single chain and STEER"></svg>
+      <svg id="sd-plot" viewBox="0 0 420 380" role="img" aria-label="FID versus CLIP score for single chain and STEER"></svg>
       <div class="plot-legend">
         <span><i class="dash" style="border-color:#9a9a9a"></i>Single chain</span>
         <span><i style="border-color:var(--red)"></i>STEER</span>
@@ -886,7 +886,7 @@
 
   // Draws gridlines, ticks and axis labels; returns x/y scale functions.
   function axes(svg, o) {
-    var W = 480, H = 340, L = 56, R = 14, T = 12, B = 48;
+    var W = 420, H = 380, L = 56, R = 14, T = 12, B = 48;
     var sx = function (v) { return L + (v - o.x[0]) / (o.x[1] - o.x[0]) * (W - L - R); };
     var sy = function (v) { return H - B - (v - o.y[0]) / (o.y[1] - o.y[0]) * (H - T - B); };
     o.xt.forEach(function (v) {
