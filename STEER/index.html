@@ -346,6 +346,11 @@
   .plot-legend i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; }
   .plot-legend i.dot { width: 10px; height: 10px; border: 1px solid #0b0b0b; border-radius: 50%; }
   .plot-legend i.dash { border-top-style: dashed; }
+  .plot-hint { margin: auto 0 0; padding-top: 10px; font-size: 13px; color: var(--muted); text-align: center; }
+  .plot-card svg .curve { cursor: pointer; transition: opacity 0.25s ease; }
+  .plot-card svg .curve:focus { outline: none; }
+  .plot-card svg .curve:focus-visible .hit { stroke: rgba(74, 109, 156, 0.18); }
+  .plot-card svg .curve-label { font-size: 13px; font-weight: 700; fill: var(--text); }
 
   /* ---------- Continuous control (dark muted blue-purple band) ---------- */
   .band-control {
@@ -711,19 +716,14 @@
 
     <div class="plot-card">
       <h3>Fidelity vs. prompt alignment</h3>
-      <p class="plot-sub">FID vs. CLIP score across &lambda;; down and right is better</p>
-      <svg id="sd-plot" viewBox="0 0 420 380" role="img" aria-label="FID versus CLIP score for single chain and STEER"></svg>
+      <p class="plot-sub">FID vs. CLIP score across &lambda;; down and right is better. Labels give the number of STEER replicas.</p>
+      <svg id="sd-plot" viewBox="0 0 420 445" role="img" aria-label="FID versus CLIP score for single chain and STEER"></svg>
       <div class="plot-legend">
         <span><i class="dash" style="border-color:#9a9a9a"></i>Single chain</span>
         <span><i style="border-color:var(--red)"></i>STEER</span>
         <span id="sd-lambda-legend"></span>
       </div>
-      <div class="plot-control">
-        <label for="nrep">STEER replicas</label>
-        <span class="val" id="nrep-out">4</span>
-      </div>
-      <input type="range" id="nrep" min="0" max="3" step="1" value="1">
-      <div class="ticks" id="nrep-ticks"></div>
+      <p class="plot-hint" id="sd-hint">Click a STEER curve to highlight it</p>
     </div>
 
   </div>
@@ -886,7 +886,7 @@
 
   // Draws gridlines, ticks and axis labels; returns x/y scale functions.
   function axes(svg, o) {
-    var W = 420, H = 380, L = 56, R = 14, T = 12, B = 48;
+    var W = 420, H = 445, L = 56, R = 14, T = 12, B = 48;
     var sx = function (v) { return L + (v - o.x[0]) / (o.x[1] - o.x[0]) * (W - L - R); };
     var sy = function (v) { return H - B - (v - o.y[0]) / (o.y[1] - o.y[0]) * (H - T - B); };
     o.xt.forEach(function (v) {
@@ -910,19 +910,6 @@
     attrs['stroke-linecap'] = 'round';
     attrs['stroke-linejoin'] = 'round';
     return el(g, 'path', attrs);
-  }
-
-  function makeTicks(box, labels, input, onPick) {
-    labels.forEach(function (t, i) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = t;
-      b.addEventListener('click', function () { input.value = i; onPick(); });
-      box.appendChild(b);
-    });
-    return function (i) {
-      Array.prototype.forEach.call(box.children, function (b, j) { b.classList.toggle('active', j === i); });
-    };
   }
 
   // λ -> colour, blue (0.95) to red (1.10), matching the page's slider gradient.
@@ -959,44 +946,67 @@
     return '<i class="dot" style="background:' + lamColor(l) + '"></i>';
   }).join('') + '&nbsp;&lambda; 0.95 &rarr; 1.10';
 
-  var nrep = document.getElementById('nrep');
-  var nrepOut = document.getElementById('nrep-out');
-  var nrepActive = makeTicks(document.getElementById('nrep-ticks'), NREPS, nrep, drawSD);
+  // Click a STEER curve to highlight it and fade the others; click it again to show all.
+  var selected = 4;
+  var hint = document.getElementById('sd-hint');
+
+  function select(n) {
+    selected = selected === n ? null : n;
+    drawSD();
+  }
 
   function drawSD() {
-    var i = +nrep.value, n = NREPS[i];
-    nrepOut.textContent = n;
-    nrepActive(i);
     var g = sd.layer;
     while (g.firstChild) g.removeChild(g.firstChild);
-    // Other replica counts as faint context.
-    NREPS.forEach(function (m) {
-      if (m !== n) path(g, sdPts(m), { stroke: '#e3d6d4', 'stroke-width': 1.5 });
-    });
-    // Single chain baseline.
+    hint.textContent = selected
+      ? 'Showing ' + selected + ' replicas \u00b7 click it again to show all'
+      : 'Click a STEER curve to highlight it';
+
+    // Single chain baseline, always shown.
     var base = sdPts(1);
     path(g, base, { stroke: GRAY, 'stroke-width': 2, 'stroke-dasharray': '6 4' });
     base.forEach(function (p, k) {
       var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 4.5, fill: '#d6d6d6', stroke: GRAY, 'stroke-width': 1 });
       el(c, 'title', {}, 'Single chain, \u03bb ' + LAMBDAS[k].toFixed(2) + ': CLIP ' + SD[1].clip[k].toFixed(2) + ', FID ' + SD[1].fid[k].toFixed(2));
     });
-    // Selected STEER curve, each segment coloured by λ.
-    var pts = sdPts(n);
-    for (var k = 0; k < pts.length - 1; k++) {
-      path(g, [pts[k], pts[k + 1]], { stroke: lamColor((LAMBDAS[k] + LAMBDAS[k + 1]) / 2), 'stroke-width': 3 });
-    }
-    // Ring the points at the temperature chosen on the samples slider.
-    [base[lamIdx], pts[lamIdx]].forEach(function (p) {
-      el(g, 'circle', { cx: p[0], cy: p[1], r: 11, fill: 'none', stroke: lamColor(LAMBDAS[lamIdx]), 'stroke-width': 2.5, opacity: 0.6 });
+
+    // Draw the selected curve last so it sits on top.
+    var order = NREPS.filter(function (m) { return m !== selected; });
+    if (selected) order.push(selected);
+    order.forEach(function (n) {
+      var on = !selected || n === selected;
+      var pts = sdPts(n);
+      var cg = el(g, 'g', { class: 'curve', opacity: on ? 1 : 0.15, tabindex: 0, role: 'button',
+                            'aria-label': 'STEER with ' + n + ' replicas' });
+      cg.addEventListener('click', function () { select(n); });
+      cg.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(n); }
+      });
+      // Wide transparent stroke so the thin line is easy to click.
+      path(cg, pts, { class: 'hit', stroke: 'transparent', 'stroke-width': 16 });
+      for (var k = 0; k < pts.length - 1; k++) {
+        path(cg, [pts[k], pts[k + 1]], { stroke: lamColor((LAMBDAS[k] + LAMBDAS[k + 1]) / 2),
+                                         'stroke-width': n === selected ? 3.5 : 2.5 });
+      }
+      pts.forEach(function (p, k) {
+        var c = el(cg, 'circle', { cx: p[0], cy: p[1], r: n === selected ? 6 : 4.5,
+                                   fill: lamColor(LAMBDAS[k]), stroke: '#0b0b0b', 'stroke-width': 1 });
+        el(c, 'title', {}, 'STEER (' + n + ' replicas), \u03bb ' + LAMBDAS[k].toFixed(2) + ': CLIP ' + SD[n].clip[k].toFixed(2) + ', FID ' + SD[n].fid[k].toFixed(2));
+      });
+      var last = pts[pts.length - 1];
+      el(cg, 'text', { class: 'curve-label', x: last[0] + 9, y: last[1] + 4.5 }, n);
     });
-    pts.forEach(function (p, k) {
-      var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 6, fill: lamColor(LAMBDAS[k]), stroke: '#0b0b0b', 'stroke-width': 1 });
-      el(c, 'title', {}, 'STEER (' + n + ' replicas), \u03bb ' + LAMBDAS[k].toFixed(2) + ': CLIP ' + SD[n].clip[k].toFixed(2) + ', FID ' + SD[n].fid[k].toFixed(2));
+
+    // Ring the points at the temperature chosen on the samples slider.
+    var ringed = [base].concat(selected ? [sdPts(selected)] : []);
+    ringed.forEach(function (pts) {
+      var p = pts[lamIdx];
+      el(g, 'circle', { cx: p[0], cy: p[1], r: 11, fill: 'none', stroke: lamColor(LAMBDAS[lamIdx]),
+                        'stroke-width': 2.5, opacity: 0.6, 'pointer-events': 'none' });
     });
   }
   var lamIdx = +document.getElementById('lambda').value;
   document.addEventListener('lambdachange', function (e) { lamIdx = e.detail; drawSD(); });
-  nrep.addEventListener('input', drawSD);
   drawSD();
 
 })();
