@@ -81,30 +81,13 @@
   }
 
   h1.project {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 168px;
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 60px;
     font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: 0.02em;
-    margin: 0 0 10px;
-    background: linear-gradient(90deg, var(--blue), var(--mauve), var(--red), var(--blue));
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: shimmer 4s ease-in-out infinite;
-  }
-
-  @keyframes shimmer {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-
-  .subtitle {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 24px;
-    font-weight: 500;
-    margin: 0 0 18px;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    max-width: 980px;
+    margin: 0 auto 22px;
   }
 
   .meta {
@@ -511,8 +494,7 @@
     .sd-label { font-size: 12px; }
     .sd-grid a { border-width: 2px; border-radius: 6px; }
     .maze-grid { grid-template-columns: 1fr; gap: 14px; }
-    h1.project { font-size: clamp(56px, 24vw, 96px); }
-    .subtitle { font-size: 19px; }
+    h1.project { font-size: 34px; }
   }
 </style>
 </head>
@@ -524,8 +506,7 @@
 
   <!-- ============ TITLE ============ -->
   <div class="title-block">
-    <h1 class="project">STEER</h1>
-    <p class="subtitle">Diverse Low-Temperature Diffusion Sampling<br>through Replica Exchange</p>
+    <h1 class="project">Diverse Low-Temperature Diffusion Sampling<br>through Replica Exchange</h1>
     <div class="meta">
       <span class="author">Zoe Wu</span>, Haldun Balim, Yilun Du &middot; Under Review
     </div>
