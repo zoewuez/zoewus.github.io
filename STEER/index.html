@@ -493,6 +493,35 @@
     background: #0b1020;
   }
 
+  /* ---------- BibTeX ---------- */
+  .bibtex { position: relative; }
+  .bibtex pre {
+    margin: 0;
+    padding: 20px 22px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    font-size: 13.5px;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #f6f7f9;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .copy-btn:hover { color: var(--red); }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
@@ -766,6 +795,29 @@
 
 </div>
 </section>
+
+<!-- ============ BIBTEX ============ -->
+<div class="container">
+  <h2 class="section-title" id="bibtex">BibTeX</h2>
+  <!-- TODO: update venue/year once the paper is public -->
+  <div class="bibtex">
+    <button type="button" class="copy-btn" id="copy-bib">Copy</button>
+<pre id="bib">@article{wu2026steer,
+  title   = {STEER: Diverse Low-Temperature Diffusion Sampling through Replica Exchange},
+  author  = {Wu, Zoe and Balim, Haldun and Du, Yilun},
+  year    = {2026}
+}</pre>
+  </div>
+  <script>
+    document.getElementById('copy-bib').addEventListener('click', function () {
+      var btn = this;
+      navigator.clipboard.writeText(document.getElementById('bib').textContent).then(function () {
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+      });
+    });
+  </script>
+</div>
 
 <script>
   // Folder suffix in images/steer_web/ uses the temperature with "." -> "_" (e.g. steer_1_1 = λ 1.1).
