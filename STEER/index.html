@@ -316,14 +316,12 @@
   }
 
   /* ---------- Quantitative results (SD plot) ---------- */
-  /* Samples card and plot card side by side, a little wider than the text column. */
+  /* Samples card and plot card side by side, spanning the text column. */
   .sd-layout {
     display: grid;
     grid-template-columns: 1.08fr 1fr;
-    gap: 22px;
+    gap: 20px;
     align-items: stretch;
-    width: min(1200px, 94vw);
-    margin-left: calc(50% - min(600px, 47vw));
   }
   .plot-card {
     display: flex;
@@ -499,7 +497,7 @@
 
   /* ---------- Responsive ---------- */
   @media (max-width: 720px) {
-    .sd-layout { grid-template-columns: 1fr; width: auto; margin-left: 0; }
+    .sd-layout { grid-template-columns: 1fr; }
     .sd-grid { grid-template-columns: 16px repeat(3, 1fr); gap: 5px; }
     .sd-label { font-size: 11px; }
     .sd-grid a { border-width: 2px; border-radius: 6px; }
@@ -609,7 +607,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 14px;
+    padding: 16px;
     border-radius: 18px;
     background: var(--card);
     border: 1px solid var(--border);
