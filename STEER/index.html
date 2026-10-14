@@ -868,7 +868,7 @@
   <div class="protein-row">
   <div class="plot-card protein-card">
     <h3>Fidelity vs. designability</h3>
-    <p class="plot-sub">FID vs. designability across &lambda;; down and right is better.</p>
+    <p class="plot-sub">FID vs. designability across &lambda;, with linear trendlines; down and right is better.</p>
     <svg id="protein-plot" viewBox="0 0 470 400" role="img" aria-label="FID versus designability for No Swaps and STEER on protein backbone generation"></svg>
     <div class="plot-legend">
       <span><i class="dash" style="border-color:#9a9a9a"></i>No Swaps</span>
@@ -1317,21 +1317,30 @@
       return name + ', \u03bb ' + P_LAMBDAS[k].toFixed(1) + ': designability ' +
         (PROT[m].pass[k] / 780 * 100).toFixed(1) + '%, FID ' + (PROT[m].fid[k] / 1e6).toFixed(3) + '\u00d710\u2076';
     };
+    // Least-squares trendline of FID on designability, drawn across each method's own x range.
+    function trend(m) {
+      var xs = PROT[m].pass.map(function (n) { return n / 780 * 100; });
+      var ys = PROT[m].fid.map(function (f) { return f / 1e6; });
+      var n = xs.length, mx = 0, my = 0, sxy = 0, sxx = 0;
+      xs.forEach(function (x, i) { mx += x / n; my += ys[i] / n; });
+      xs.forEach(function (x, i) { sxy += (x - mx) * (ys[i] - my); sxx += (x - mx) * (x - mx); });
+      var b = sxy / sxx, a = my - b * mx;
+      var x0 = Math.min.apply(null, xs) - 1, x1 = Math.max.apply(null, xs) + 1;
+      return [[pr.sx(x0), pr.sy(a + b * x0)], [pr.sx(x1), pr.sy(a + b * x1)]];
+    }
     var base = prPts('tsr');
-    path(g, base, { stroke: GRAY, 'stroke-width': 2, 'stroke-dasharray': '6 4' });
+    path(g, trend('tsr'), { stroke: GRAY, 'stroke-width': 2.5, 'stroke-dasharray': '6 4' });
     base.forEach(function (p, k) {
       var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 5, fill: '#d6d6d6', stroke: GRAY, 'stroke-width': 1 });
       el(c, 'title', {}, tip('No Swaps', 'tsr', k));
     });
     var pts = prPts('steer');
-    for (var k = 0; k < pts.length - 1; k++) {
-      path(g, [pts[k], pts[k + 1]], { stroke: pColor((P_LAMBDAS[k] + P_LAMBDAS[k + 1]) / 2), 'stroke-width': 3.5 });
-    }
+    path(g, trend('steer'), { stroke: '#b5524a', 'stroke-width': 3.5 });
     pts.forEach(function (p, k) {
       var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 6, fill: pColor(P_LAMBDAS[k]), stroke: '#0b0b0b', 'stroke-width': 1 });
       el(c, 'title', {}, tip('STEER', 'steer', k));
     });
-    // Label the sweep endpoints on both curves: λ 0.5 sits at the right end, λ 0.9 at the left.
+    // Label the sweep endpoints on both point sets: λ 0.5 sits at the right end, λ 0.9 at the left.
     [base, pts].forEach(function (c) {
       var first = c[0], last = c[c.length - 1];
       el(g, 'text', { class: 'pt-label', x: first[0] + 11, y: first[1] + 4.5 }, '\u03bb 0.5');
