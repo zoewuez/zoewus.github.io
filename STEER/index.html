@@ -322,7 +322,7 @@
   /* Samples card and plot card side by side, spanning the text column. */
   .sd-layout {
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
+    grid-template-columns: 1.5fr 1fr;
     gap: 20px;
     align-items: stretch;
   }
@@ -809,23 +809,8 @@
     allowing low-temperature sampling that stays sharp without sacrificing semantic fidelity.
   </p>
 
-  <!-- ============ QUANTITATIVE PLOT + SAMPLES (side by side) ============ -->
+  <!-- ============ SAMPLES + QUANTITATIVE PLOT (side by side) ============ -->
   <div class="sd-layout">
-    <div class="plot-card">
-      <h3>Fidelity vs. prompt alignment</h3>
-      <p class="plot-sub">FID vs. CLIP score across &lambda;; down and right is better. Pick a replica count below (or click a curve) to highlight it.</p>
-      <svg id="sd-plot" viewBox="0 0 420 445" role="img" aria-label="FID versus CLIP score for No Swaps and STEER"></svg>
-      <div class="plot-legend">
-        <span><i class="dash" style="border-color:#9a9a9a"></i>No Swaps</span>
-        <span><i style="border-color:var(--red)"></i>STEER</span>
-        <span id="sd-lambda-legend"></span>
-      </div>
-      <div class="rep-control">
-        <span class="rep-label">STEER replicas</span>
-        <div class="ticks rep-buttons" id="sd-reps" role="group" aria-label="Highlight STEER curve by number of replicas"></div>
-      </div>
-    </div>
-
     <div class="plot-card sample-card">
       <h3>Stable Diffusion samples</h3>
       <p class="plot-sub">No Swaps vs. STEER with 4 replicas, same prompts</p>
@@ -839,6 +824,21 @@
       </div>
       <input type="range" id="lambda" min="0" max="4" step="1" value="0">
       <div class="ticks" id="ticks"></div>
+    </div>
+
+    <div class="plot-card">
+      <h3>Fidelity vs. prompt alignment</h3>
+      <p class="plot-sub">FID vs. CLIP score across &lambda;; down and right is better. Pick a replica count below (or click a curve) to highlight it.</p>
+      <svg id="sd-plot" viewBox="0 0 420 445" role="img" aria-label="FID versus CLIP score for No Swaps and STEER"></svg>
+      <div class="plot-legend">
+        <span><i class="dash" style="border-color:#9a9a9a"></i>No Swaps</span>
+        <span><i style="border-color:var(--red)"></i>STEER</span>
+        <span id="sd-lambda-legend"></span>
+      </div>
+      <div class="rep-control">
+        <span class="rep-label">STEER replicas</span>
+        <div class="ticks rep-buttons" id="sd-reps" role="group" aria-label="Highlight STEER curve by number of replicas"></div>
+      </div>
     </div>
 
   </div>
