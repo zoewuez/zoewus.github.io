@@ -321,7 +321,7 @@
   /* Samples card and plot card side by side, spanning the text column. */
   .sd-layout {
     display: grid;
-    grid-template-columns: 1.5fr 1fr;
+    grid-template-columns: 1fr 1.5fr;
     gap: 20px;
     align-items: stretch;
   }
@@ -375,10 +375,17 @@
     margin: 44px 0 10px;
   }
   h2.section-title + .sub-title.fidelity-sub { margin-top: 8px; }
-  .protein-card { max-width: 640px; margin: 0 auto; }
+  /* Protein row: FID vs. designability (left), replica scaling (right). */
+  .protein-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
+  .scaling-stat { margin: 2px 0 4px; font-size: 15px; color: var(--muted); }
+  .scaling-stat strong { font-size: 24px; color: var(--steer); margin-right: 2px; }
+  .scaling-stat span { color: var(--steer); font-weight: 600; }
+  .plot-card svg .rep-pill { fill: var(--steer); }
+  .plot-card svg .rep-num { fill: #fff; font-size: 14px; font-weight: 700; }
+  .plot-card svg .row-label { fill: var(--steer); font-size: 13px; font-weight: 700; }
   /* Point-maze success plot: white card inside the dark continuous-control band. */
   /* Videos stretch to the plot card's height; each video letterboxes into its cell on the frame's own dark background. */
-  .maze-row { display: grid; grid-template-columns: 1.25fr 1fr; gap: 20px; align-items: stretch; }
+  .maze-row { display: grid; grid-template-columns: 1fr 1.25fr; gap: 20px; align-items: stretch; }
   .maze-grid.maze-videos { gap: 12px; grid-template-rows: 1fr 1fr; }
   .maze-grid.maze-videos figure { padding: 6px; border-radius: 12px; display: flex; min-height: 0; }
   .maze-grid.maze-videos video { border-radius: 7px; aspect-ratio: auto; height: 100%; min-height: 0; object-fit: contain; }
@@ -598,7 +605,7 @@
     .sd-label { font-size: 11px; }
     .sd-grid a { border-width: 2px; border-radius: 6px; }
     .maze-grid { grid-template-columns: 1fr; gap: 14px; }
-    .maze-row, .robo-row { grid-template-columns: 1fr; }
+    .maze-row, .robo-row, .protein-row { grid-template-columns: 1fr; }
     .robo-row .robo-grid { order: -1; }
     .maze-grid.robo-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
     .maze-grid.maze-videos { grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -802,23 +809,8 @@
     allowing low-temperature sampling that stays sharp without sacrificing semantic fidelity.
   </p>
 
-  <!-- ============ SAMPLES + QUANTITATIVE PLOT (side by side) ============ -->
+  <!-- ============ QUANTITATIVE PLOT + SAMPLES (side by side) ============ -->
   <div class="sd-layout">
-    <div class="plot-card sample-card">
-      <h3>Stable Diffusion samples</h3>
-      <p class="plot-sub">No Swaps vs. STEER with 4 replicas, same prompts</p>
-      <div class="sd-grid" id="sd-grid">
-        <div class="sd-label">No Swaps</div>
-        <div class="sd-label steer">STEER</div>
-      </div>
-      <div class="plot-control">
-        <label for="lambda">Temperature</label>
-        <span class="val"><em>&lambda;</em> = <span id="lambda-out">0.95</span></span>
-      </div>
-      <input type="range" id="lambda" min="0" max="4" step="1" value="0">
-      <div class="ticks" id="ticks"></div>
-    </div>
-
     <div class="plot-card">
       <h3>Fidelity vs. prompt alignment</h3>
       <p class="plot-sub">FID vs. CLIP score across &lambda;; down and right is better. Pick a replica count below (or click a curve) to highlight it.</p>
@@ -834,23 +826,51 @@
       </div>
     </div>
 
+    <div class="plot-card sample-card">
+      <h3>Stable Diffusion samples</h3>
+      <p class="plot-sub">No Swaps vs. STEER with 4 replicas, same prompts</p>
+      <div class="sd-grid" id="sd-grid">
+        <div class="sd-label">No Swaps</div>
+        <div class="sd-label steer">STEER</div>
+      </div>
+      <div class="plot-control">
+        <label for="lambda">Temperature</label>
+        <span class="val"><em>&lambda;</em> = <span id="lambda-out">0.95</span></span>
+      </div>
+      <input type="range" id="lambda" min="0" max="4" step="1" value="0">
+      <div class="ticks" id="ticks"></div>
+    </div>
+
   </div>
 
   <!-- ============ PROTEIN BACKBONE GENERATION ============ -->
   <h3 class="sub-title fidelity-sub">Protein generation</h3>
   <p class="section-intro">
     Each point is a temperature <em>&lambda;</em> on protein backbone generation; STEER shifts the
-    fidelity&ndash;designability trendline favorably.
+    fidelity&ndash;designability trendline favorably. Its advantage holds as proteins get longer and
+    we give it more replicas.
   </p>
+  <div class="protein-row">
   <div class="plot-card protein-card">
     <h3>Fidelity vs. designability</h3>
     <p class="plot-sub">FID vs. designability across &lambda;; down and right is better.</p>
-    <svg id="protein-plot" viewBox="0 0 560 380" role="img" aria-label="FID versus designability for No Swaps and STEER on protein backbone generation"></svg>
+    <svg id="protein-plot" viewBox="0 0 470 400" role="img" aria-label="FID versus designability for No Swaps and STEER on protein backbone generation"></svg>
     <div class="plot-legend">
       <span><i class="dash" style="border-color:#9a9a9a"></i>No Swaps</span>
       <span><i style="border-color:var(--red)"></i>STEER</span>
       <span id="protein-lambda-legend"></span>
     </div>
+  </div>
+
+  <div class="plot-card scaling-card">
+    <h3>Longer proteins, more replicas</h3>
+    <p class="scaling-stat"><strong>44.2%</strong> vs. 35.9% designable overall <span>(+8.3 pts)</span></p>
+    <svg id="scaling-plot" viewBox="0 0 470 400" role="img" aria-label="Designable success rate by protein length for No Swaps and STEER; the number of STEER replicas grows from 4 to 10 with length"></svg>
+    <div class="plot-legend">
+      <span><i class="dash" style="border-color:#9a9a9a"></i>No Swaps</span>
+      <span><i style="border-color:var(--red)"></i>STEER</span>
+    </div>
+  </div>
   </div>
 
 </div>
@@ -869,6 +889,12 @@
     follow the maze walls.
   </p>
   <div class="maze-row">
+  <div class="plot-card maze-card">
+    <h3>Success rate vs. number of particles</h3>
+    <p class="plot-sub">Giant point maze; mean &plusmn; std over 5 seeds. Click a method to highlight it.</p>
+    <svg id="maze-plot" viewBox="0 0 430 340" role="img" aria-label="Success rate versus number of particles for STEER, BFS, CNS, CREPE and No Swaps on the giant point maze"></svg>
+    <div class="plot-legend maze-legend" id="maze-legend"></div>
+  </div>
   <div class="maze-grid maze-videos">
     <figure class="maze-steer">
       <video src="../images/maze/steer.mp4" autoplay muted loop playsinline aria-label="STEER solving a giant point maze"></video>
@@ -884,12 +910,6 @@
     </figure>
   </div>
 
-  <div class="plot-card maze-card">
-    <h3>Success rate vs. number of particles</h3>
-    <p class="plot-sub">Giant point maze; mean &plusmn; std over 5 seeds. Click a method to highlight it.</p>
-    <svg id="maze-plot" viewBox="0 0 430 340" role="img" aria-label="Success rate versus number of particles for STEER, BFS, CNS, CREPE and No Swaps on the giant point maze"></svg>
-    <div class="plot-legend maze-legend" id="maze-legend"></div>
-  </div>
   </div>
 
   <!-- ============ ROBOMIMIC ============ -->
@@ -1092,7 +1112,7 @@
 
   // Draws gridlines, ticks and axis labels; returns x/y scale functions.
   function axes(svg, o) {
-    var W = o.W || 420, H = o.H || 445, L = o.L || 56, R = 14, T = 12, B = 48;
+    var W = o.W || 420, H = o.H || 445, L = o.L || 56, R = 14, T = 12, B = o.B || 48;
     var sx = function (v) { return L + (v - o.x[0]) / (o.x[1] - o.x[0]) * (W - L - R); };
     var sy = function (v) { return H - B - (v - o.y[0]) / (o.y[1] - o.y[0]) * (H - T - B); };
     o.xt.forEach(function (v) {
@@ -1233,7 +1253,7 @@
     steer: { pass: [336, 282, 254, 249, 241], fid: [4956776.5, 4724687.0, 4740686.0, 4676160.0, 4789692.0] }
   };
   var pr = axes(document.getElementById('protein-plot'), {
-    W: 560, H: 380, L: 60,
+    W: 470, H: 400, L: 60,
     x: [26, 46], y: [4.5, 5.3],
     xt: [26, 30, 34, 38, 42, 46], yt: [4.5, 4.6, 4.7, 4.8, 4.9, 5.0, 5.1, 5.2, 5.3],
     xf: function (v) { return v + '%'; }, yf: function (v) { return v.toFixed(1); },
@@ -1271,6 +1291,61 @@
       var first = c[0], last = c[c.length - 1];
       el(g, 'text', { class: 'pt-label', x: first[0] + 11, y: first[1] + 4.5 }, '\u03bb 0.5');
       el(g, 'text', { class: 'pt-label', x: last[0] - 11, y: last[1] + 4.5, 'text-anchor': 'end' }, '\u03bb 0.9');
+    });
+  })();
+
+  /* ---------------- Protein replica scaling: success rate by length bin ---------------- */
+  // Success = scTM > 0.8. The replica budget grows with protein length (4 replicas at 50-60 aa ... 10 at 110-128 aa).
+  var SC_BINS = ['50\u201360', '60\u201370', '70\u201380', '80\u201390', '90\u2013100', '100\u2013110', '110\u2013128'];
+  var SC_REPS = [4, 5, 6, 7, 8, 9, 10];
+  var SC_N    = [20, 20, 20, 20, 20, 20, 36];
+  var SC = {
+    tsr:   [11, 10, 6, 9, 6, 6, 8],
+    steer: [13, 11, 9, 10, 6, 8, 12]
+  };
+  // Wilson 95% interval, shown in the hover text only to keep the plot simple.
+  function wilson(k, n) {
+    var z = 1.96, p = k / n, d = 1 + z * z / n, c = (p + z * z / (2 * n)) / d;
+    var h = z / d * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n));
+    return [Math.max(0, c - h) * 100, Math.min(1, c + h) * 100];
+  }
+  var scSvg = document.getElementById('scaling-plot');
+  var sc = axes(scSvg, {
+    W: 470, H: 400, L: 60, B: 92,
+    x: [-0.5, 6.5], y: [0, 80],
+    xt: [0, 1, 2, 3, 4, 5, 6], yt: [0, 20, 40, 60, 80],
+    xf: function (v) { return SC_BINS[v]; }, yf: function (v) { return v + '%'; },
+    xl: 'Protein length (residues)', yl: 'Designable (\u2191 better)'
+  });
+  (function () {
+    var g = sc.layer;
+    var base = SC.tsr.map(function (k, i) { return [sc.sx(i), sc.sy(k / SC_N[i] * 100)]; });
+    var pts = SC.steer.map(function (k, i) { return [sc.sx(i), sc.sy(k / SC_N[i] * 100)]; });
+    // Shade STEER's gain over No Swaps.
+    el(g, 'path', { d: pts.concat(base.slice().reverse()).map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join('') + 'Z',
+                    fill: '#b5524a', opacity: 0.12 });
+    path(g, base, { stroke: GRAY, 'stroke-width': 2.5, 'stroke-dasharray': '6 4' });
+    path(g, pts, { stroke: '#b5524a', 'stroke-width': 3.5 });
+    var tip = function (name, m, i) {
+      var ci = wilson(SC[m][i], SC_N[i]);
+      return name + ', ' + SC_BINS[i] + ' residues, ' + SC_REPS[i] + ' replicas: ' + SC[m][i] + '/' + SC_N[i] +
+        ' = ' + (SC[m][i] / SC_N[i] * 100).toFixed(1) + '% (95% CI ' + ci[0].toFixed(0) + '\u2013' + ci[1].toFixed(0) + '%)';
+    };
+    base.forEach(function (p, i) {
+      var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 5, fill: '#d6d6d6', stroke: GRAY, 'stroke-width': 1 });
+      el(c, 'title', {}, tip('No Swaps', 'tsr', i));
+    });
+    pts.forEach(function (p, i) {
+      var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 6.5, fill: '#b5524a', stroke: '#fff', 'stroke-width': 1.5 });
+      el(c, 'title', {}, tip('STEER', 'steer', i));
+    });
+    // Replica budget under each length bin: a red pill per bin, widening with the count, plus a row label.
+    var H = 400, B = 92, y = H - B + 44;
+    el(scSvg, 'text', { class: 'row-label', x: sc.sx(-0.5) - 8, y: y + 5, 'text-anchor': 'end' }, 'replicas');
+    SC_REPS.forEach(function (r, i) {
+      var w = 24 + (r - 4) * 3.5;
+      el(scSvg, 'rect', { class: 'rep-pill', x: sc.sx(i) - w / 2, y: y - 12, width: w, height: 24, rx: 12 });
+      el(scSvg, 'text', { class: 'rep-num', x: sc.sx(i), y: y + 5, 'text-anchor': 'middle' }, r);
     });
   })();
 
