@@ -360,13 +360,14 @@
   .plot-card svg .curve-label { font-size: 13px; font-weight: 700; fill: var(--text); }
 
   /* Protein backbone plot: its own centered card below the SD row. */
-  .sub-title.protein-title {
+  /* Per-sample fidelity subsections: Stable Diffusion, then protein generation. */
+  .sub-title.fidelity-sub {
     font-size: 22px;
     font-weight: 700;
     line-height: 1.3;
-    margin: 44px 0 16px;
+    margin: 44px 0 10px;
   }
-  .sub-title.protein-title em { font-style: italic; }
+  h2.section-title + .sub-title.fidelity-sub { margin-top: 8px; }
   .protein-card { max-width: 640px; margin: 0 auto; }
   .plot-card svg .pt-label { font-size: 12.5px; font-weight: 600; fill: var(--text); }
 
@@ -753,6 +754,8 @@
 <div class="container">
   <!-- ============ SAMPLES ============ -->
   <h2 class="section-title" id="per-sample-fidelity">STEER enhances per-sample fidelity</h2>
+
+  <h3 class="sub-title fidelity-sub">Stable Diffusion</h3>
   <p class="section-intro">
     Lowering the temperature sharpens samples, but a single chain pushed to low temperature tends to
     lose semantic fidelity to the prompt. STEER exchanges samples with higher-temperature replicas,
@@ -791,9 +794,13 @@
   </div>
 
   <!-- ============ PROTEIN BACKBONE GENERATION ============ -->
-  <h3 class="sub-title protein-title">Each point is a temperature <em>&lambda;</em> on protein backbone generation; STEER shifts the fidelity&ndash;designability trendline favorably.</h3>
+  <h3 class="sub-title fidelity-sub">Protein generation</h3>
+  <p class="section-intro">
+    Each point is a temperature <em>&lambda;</em> on protein backbone generation; STEER shifts the
+    fidelity&ndash;designability trendline favorably.
+  </p>
   <div class="plot-card protein-card">
-    <h3>Protein generation</h3>
+    <h3>Fidelity vs. designability</h3>
     <p class="plot-sub">FID vs. designability across &lambda;; down and right is better.</p>
     <svg id="protein-plot" viewBox="0 0 560 380" role="img" aria-label="FID versus designability for single chain and STEER on protein backbone generation"></svg>
     <div class="plot-legend">
