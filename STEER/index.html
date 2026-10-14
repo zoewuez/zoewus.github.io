@@ -435,13 +435,34 @@
 
   .robo-tabs {
     justify-content: center;
-    gap: 6px;
-    margin: 0 0 16px;
-    font-size: 14px;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 4px 0 22px;
+    font-size: 16px;
   }
-  .band-control .robo-tabs { color: rgba(243, 241, 248, 0.72); }
-  .band-control .robo-tabs button:hover { color: #fff; }
-  .band-control .robo-tabs button.active { background: var(--steer); color: #fff; }
+  .ticks.robo-tabs button {
+    min-width: 132px;
+    padding: 10px 22px;
+    font-weight: 600;
+    border: 2px solid rgba(243, 241, 248, 0.45);
+    background: rgba(255, 255, 255, 0.08);
+    color: #f3f1f8;
+  }
+  .ticks.robo-tabs button:hover {
+    color: #fff;
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.16);
+  }
+  .ticks.robo-tabs button.active {
+    background: var(--steer);
+    border-color: var(--steer);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 6px 16px -6px rgba(181, 82, 74, 0.7);
+  }
+  @media (max-width: 600px) {
+    .ticks.robo-tabs button { min-width: 0; flex: 1 1 40%; padding: 9px 12px; }
+  }
 
   .robo-outcome {
     font-size: 12px;
