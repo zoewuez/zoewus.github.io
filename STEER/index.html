@@ -154,7 +154,8 @@
   /* ---------- Section headings ---------- */
   /* Headings on light backgrounds share the title band's navy; the dark control band overrides this. */
   h2.section-title, h3.sub-title, .plot-card h3 { color: #1e2846; }
-  .band-control h2.section-title, .band-control h3.sub-title { color: #f3f1f8; }
+  .band-control h2.section-title, .band-control h3.sub-title,
+  .band-fidelity h2.section-title, .band-fidelity h3.sub-title { color: #f3f1f8; }
   h2.section-title {
     font-size: 30px;
     font-weight: 700;
@@ -402,6 +403,17 @@
   .maze-legend button.steer-key { color: var(--text); font-weight: 700; }
   .plot-card svg .series { transition: opacity 0.25s ease; }
   .plot-card svg .pt-label { font-size: 12.5px; font-weight: 600; fill: var(--text); }
+
+  /* ---------- Per-sample fidelity: SD + protein (dark red band) ---------- */
+  .band-fidelity {
+    display: flow-root;
+    background: #5a1e22;
+    color: #f8efed;
+  }
+  .band-fidelity .container { padding-top: 56px; }
+  .band-fidelity h2.section-title { margin-top: 0; }
+  .band-fidelity .section-intro { color: rgba(248, 239, 237, 0.85); }
+  .band-fidelity .plot-card { color: var(--text); }
 
   /* ---------- Continuous control (dark muted blue-purple band) ---------- */
   .band-control {
@@ -807,7 +819,7 @@
 </div>
 </div>
 
-<div class="band-cream">
+<div class="band-fidelity">
 <div class="container">
   <!-- ============ SAMPLES ============ -->
   <h2 class="section-title" id="per-sample-fidelity">STEER enhances per-sample fidelity</h2>
