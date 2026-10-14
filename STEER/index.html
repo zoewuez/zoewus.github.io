@@ -394,7 +394,7 @@
   .band-control .robo-grid h3 { color: #f3f1f8; }
   .band-control .robo-grid h3.split-steer { color: #e08a7e; }
 
-  /* Rows: single chain vs STEER; columns: prompts. */
+  /* Rows: No Swaps vs STEER; columns: prompts. */
   .sd-grid {
     display: grid;
     grid-template-columns: 20px repeat(3, 1fr);
@@ -739,7 +739,7 @@
 
   <h2 class="section-title" id="global-search">STEER finds isolated modes that a single chain misses</h2>
   <figure class="gif-figure">
-    <img src="../images/steer_vs_tsr_flow.gif" alt="Animation comparing STEER with a single chain without swaps">
+    <img src="../images/steer_vs_tsr_flow.gif" alt="Animation comparing STEER with No Swaps">
   </figure>
 
   <h2 class="section-title">Exchanges propagate exploratory samples to the target chain</h2>
@@ -766,9 +766,9 @@
   <div class="sd-layout">
     <div class="plot-card sample-card">
       <h3>Stable Diffusion samples</h3>
-      <p class="plot-sub">Single chain vs. STEER with 4 replicas, same prompts</p>
+      <p class="plot-sub">No Swaps vs. STEER with 4 replicas, same prompts</p>
       <div class="sd-grid" id="sd-grid">
-        <div class="sd-label">Single chain</div>
+        <div class="sd-label">No Swaps</div>
         <div class="sd-label steer">STEER</div>
       </div>
       <div class="plot-control">
@@ -782,9 +782,9 @@
     <div class="plot-card">
       <h3>Fidelity vs. prompt alignment</h3>
       <p class="plot-sub">FID vs. CLIP score across &lambda;; down and right is better. Labels give the number of STEER replicas.</p>
-      <svg id="sd-plot" viewBox="0 0 420 445" role="img" aria-label="FID versus CLIP score for single chain and STEER"></svg>
+      <svg id="sd-plot" viewBox="0 0 420 445" role="img" aria-label="FID versus CLIP score for No Swaps and STEER"></svg>
       <div class="plot-legend">
-        <span><i class="dash" style="border-color:#9a9a9a"></i>Single chain</span>
+        <span><i class="dash" style="border-color:#9a9a9a"></i>No Swaps</span>
         <span><i style="border-color:var(--red)"></i>STEER</span>
         <span id="sd-lambda-legend"></span>
       </div>
@@ -802,9 +802,9 @@
   <div class="plot-card protein-card">
     <h3>Fidelity vs. designability</h3>
     <p class="plot-sub">FID vs. designability across &lambda;; down and right is better.</p>
-    <svg id="protein-plot" viewBox="0 0 560 380" role="img" aria-label="FID versus designability for single chain and STEER on protein backbone generation"></svg>
+    <svg id="protein-plot" viewBox="0 0 560 380" role="img" aria-label="FID versus designability for No Swaps and STEER on protein backbone generation"></svg>
     <div class="plot-legend">
-      <span><i class="dash" style="border-color:#9a9a9a"></i>Single chain</span>
+      <span><i class="dash" style="border-color:#9a9a9a"></i>No Swaps</span>
       <span><i style="border-color:var(--red)"></i>STEER</span>
       <span id="protein-lambda-legend"></span>
     </div>
@@ -830,7 +830,7 @@
       <video src="../images/maze/steer.mp4" autoplay muted loop playsinline aria-label="STEER solving a giant point maze"></video>
     </figure>
     <figure>
-      <video src="../images/maze/tsr.mp4" autoplay muted loop playsinline aria-label="A single chain without swaps attempting the same giant point maze"></video>
+      <video src="../images/maze/tsr.mp4" autoplay muted loop playsinline aria-label="No Swaps attempting the same giant point maze"></video>
     </figure>
     <figure>
       <video src="../images/maze/bfs.mp4" autoplay muted loop playsinline aria-label="BFS-resampling attempting the same giant point maze"></video>
@@ -922,7 +922,7 @@
 <script>
   // Folder suffix in images/steer_web/ uses the temperature with "." -> "_" (e.g. steer_1_1 = λ 1.1).
   // Originals live in images/steer_tsr/ as e.g. "steer 11" for λ 1.1.
-  // Only temperatures where every scene has both a TSR (single chain) and STEER sample are listed.
+  // Only temperatures where every scene has both a No Swaps (TSR) and STEER sample are listed.
   // id = web .jpg name in steer_web/, orig = full-resolution .png name in steer_tsr/.
   var SCENES = [
     { id: 'skateboard_1176', orig: 'skateboard_1176',              name: 'skateboard' },
@@ -953,7 +953,7 @@
 
   // One row per method, placed after its label.
   var ROWS = [
-    { method: 'tsr',   label: 'Single chain', after: grid.children[0] },
+    { method: 'tsr',   label: 'No Swaps', after: grid.children[0] },
     { method: 'steer', label: 'STEER',        after: grid.children[1] }
   ];
   var cells = ROWS.map(function (r) {
@@ -1084,12 +1084,12 @@
       ? 'Showing ' + selected + ' replicas \u00b7 click it again to show all'
       : 'Click a STEER curve to highlight it';
 
-    // Single chain baseline, always shown.
+    // No Swaps baseline, always shown.
     var base = sdPts(1);
     path(g, base, { stroke: GRAY, 'stroke-width': 2, 'stroke-dasharray': '6 4' });
     base.forEach(function (p, k) {
       var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 4.5, fill: '#d6d6d6', stroke: GRAY, 'stroke-width': 1 });
-      el(c, 'title', {}, 'Single chain, \u03bb ' + LAMBDAS[k].toFixed(2) + ': CLIP ' + SD[1].clip[k].toFixed(2) + ', FID ' + SD[1].fid[k].toFixed(2));
+      el(c, 'title', {}, 'No Swaps, \u03bb ' + LAMBDAS[k].toFixed(2) + ': CLIP ' + SD[1].clip[k].toFixed(2) + ', FID ' + SD[1].fid[k].toFixed(2));
     });
 
     // Draw the selected curve last so it sits on top.
@@ -1163,7 +1163,7 @@
     path(g, base, { stroke: GRAY, 'stroke-width': 2, 'stroke-dasharray': '6 4' });
     base.forEach(function (p, k) {
       var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 5, fill: '#d6d6d6', stroke: GRAY, 'stroke-width': 1 });
-      el(c, 'title', {}, tip('Single chain', 'tsr', k));
+      el(c, 'title', {}, tip('No Swaps', 'tsr', k));
     });
     var pts = prPts('steer');
     for (var k = 0; k < pts.length - 1; k++) {
