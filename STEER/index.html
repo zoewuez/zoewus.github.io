@@ -433,6 +433,29 @@
 
   .maze-grid.robo-grid video { aspect-ratio: auto; }
 
+  .robo-tabs {
+    justify-content: center;
+    gap: 6px;
+    margin: 0 0 16px;
+    font-size: 14px;
+  }
+  .band-control .robo-tabs { color: rgba(243, 241, 248, 0.72); }
+  .band-control .robo-tabs button:hover { color: #fff; }
+  .band-control .robo-tabs button.active { background: var(--steer); color: #fff; }
+
+  .robo-outcome {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 6px;
+    vertical-align: 2px;
+  }
+  .robo-outcome.success { background: rgba(120, 200, 140, 0.18); color: #9fdcae; }
+  .robo-outcome.fail { background: rgba(224, 138, 126, 0.18); color: #f0a497; }
+
   /* ---------- Maze planning ---------- */
   .maze-grid {
     display: grid;
@@ -760,16 +783,56 @@
 
   <!-- ============ ROBOMIMIC ============ -->
   <h3 class="sub-title">STEER improves imitation learning success without any verifier or reward signal</h3>
+  <div class="ticks robo-tabs" id="robo-tabs" role="tablist" aria-label="Robomimic task"></div>
   <div class="maze-grid robo-grid">
     <figure class="maze-steer">
-      <h3 class="split-steer">STEER</h3>
-      <video src="../images/steer_robomimic/1_steer_seed50_ep13_success.mp4" autoplay muted loop playsinline aria-label="Robomimic rollout with STEER succeeding"></video>
+      <h3 class="split-steer">STEER <span class="robo-outcome" id="robo-steer-outcome"></span></h3>
+      <video id="robo-steer" autoplay muted loop playsinline></video>
     </figure>
     <figure>
-      <h3>Baseline</h3>
-      <video src="../images/steer_robomimic/2_baseline_seed50_ep13_fail.mp4" autoplay muted loop playsinline aria-label="Robomimic rollout with the baseline failing on the same episode"></video>
+      <h3>Baseline <span class="robo-outcome" id="robo-base-outcome"></span></h3>
+      <video id="robo-base" autoplay muted loop playsinline></video>
     </figure>
   </div>
+  <script>
+    (function () {
+      var DIR = '../images/steer_robomimic/';
+      var TASKS = [
+        { name: 'Square',    dir: 'square',    steer: '1_steer_seed50_ep13_success.mp4',   base: '2_baseline_seed50_ep13_fail.mp4' },
+        { name: 'Tool Hang', dir: 'tool_hang', steer: '1_steer_seed150_ep00_success.mp4',  base: '2_baseline_seed150_ep00_fail.mp4' },
+        { name: 'Can',       dir: 'can',       steer: '1_steer_seed100_ep02_success.mp4',  base: '2_baseline_seed100_ep02_success.mp4' },
+        { name: 'Lift',      dir: 'lift',      steer: '1_steer_seed50_ep00_success.mp4',   base: '2_baseline_seed50_ep00_success.mp4' }
+      ];
+      var tabs = document.getElementById('robo-tabs');
+      var vs = document.getElementById('robo-steer'), vb = document.getElementById('robo-base');
+      var os = document.getElementById('robo-steer-outcome'), ob = document.getElementById('robo-base-outcome');
+      function outcome(f) { return /_success\./.test(f) ? 'success' : 'fail'; }
+      function show(i) {
+        var t = TASKS[i];
+        vs.src = DIR + t.dir + '/' + t.steer;
+        vb.src = DIR + t.dir + '/' + t.base;
+        vs.setAttribute('aria-label', 'Robomimic ' + t.name + ' rollout with STEER (' + outcome(t.steer) + ')');
+        vb.setAttribute('aria-label', 'Robomimic ' + t.name + ' rollout with the baseline on the same episode (' + outcome(t.base) + ')');
+        [[os, t.steer], [ob, t.base]].forEach(function (p) {
+          p[0].textContent = outcome(p[1]);
+          p[0].className = 'robo-outcome ' + outcome(p[1]);
+        });
+        Array.prototype.forEach.call(tabs.children, function (b, j) {
+          b.classList.toggle('active', j === i);
+          b.setAttribute('aria-selected', j === i);
+        });
+      }
+      TASKS.forEach(function (t, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('role', 'tab');
+        b.textContent = t.name;
+        b.addEventListener('click', function () { show(i); });
+        tabs.appendChild(b);
+      });
+      show(0);
+    })();
+  </script>
 
 </div>
 </section>
