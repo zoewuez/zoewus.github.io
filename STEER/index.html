@@ -378,10 +378,11 @@
   h2.section-title + .sub-title.fidelity-sub { margin-top: 8px; }
   .protein-card { max-width: 640px; margin: 0 auto; }
   /* Point-maze success plot: white card inside the dark continuous-control band. */
-  .maze-row { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; align-items: center; }
-  .maze-grid.maze-videos { gap: 12px; }
-  .maze-grid.maze-videos figure { padding: 6px; border-radius: 12px; }
-  .maze-grid.maze-videos video { border-radius: 7px; }
+  /* Videos stretch to the plot card's height; each video letterboxes into its cell on the frame's own dark background. */
+  .maze-row { display: grid; grid-template-columns: 1.25fr 1fr; gap: 20px; align-items: stretch; }
+  .maze-grid.maze-videos { gap: 12px; grid-template-rows: 1fr 1fr; }
+  .maze-grid.maze-videos figure { padding: 6px; border-radius: 12px; display: flex; min-height: 0; }
+  .maze-grid.maze-videos video { border-radius: 7px; aspect-ratio: auto; height: 100%; min-height: 0; object-fit: contain; }
   .band-control .plot-card.maze-card { color: var(--text); }
   .maze-legend button {
     display: inline-flex; align-items: center; gap: 6px;
@@ -608,6 +609,7 @@
     .maze-grid { grid-template-columns: 1fr; gap: 14px; }
     .maze-row { grid-template-columns: 1fr; }
     .maze-grid.maze-videos { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .maze-grid.maze-videos video { aspect-ratio: 4 / 3; height: auto; }
     h1.project { font-size: 34px; width: auto; margin: 0 0 22px; white-space: normal; }
   }
 </style>
