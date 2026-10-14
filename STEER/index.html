@@ -499,8 +499,10 @@
   .maze-grid.robo-grid figure { padding: 8px; border-radius: 14px; }
 
   /* Robomimic: results table on the left, videos on the right; table column synced with the task tabs. */
-  .robo-row { display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px; align-items: center; }
+  /* Row height comes from the videos; the bar chart's SVG has no intrinsic height and fills what's left of its card. */
+  .robo-row { display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px; align-items: stretch; }
   .band-control .plot-card.robo-card { color: var(--text); }
+  .robo-card svg#robo-bars { flex: 1 1 0; min-height: 0; height: 0; }
   #robo-bar-task { color: var(--steer); }
   .robo-bars .bar { transform-box: fill-box; transform-origin: 50% 100%; animation: bar-grow 0.45s ease-out both; }
   @keyframes bar-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
@@ -622,6 +624,7 @@
     .maze-grid { grid-template-columns: 1fr; gap: 14px; }
     .maze-row, .robo-row, .protein-row { grid-template-columns: 1fr; }
     .robo-row .robo-grid { order: -1; }
+    .robo-card svg#robo-bars { flex: none; height: auto; }
     .maze-grid.robo-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
     .maze-grid.maze-videos { grid-template-columns: 1fr 1fr; gap: 8px; }
     .maze-grid.maze-videos video { aspect-ratio: 4 / 3; height: auto; }
@@ -933,8 +936,8 @@
   <div class="robo-row">
   <div class="plot-card robo-card">
     <h3>Success rate on <span id="robo-bar-task">Square</span></h3>
-    <p class="plot-sub">Mean &plusmn; std. The axis zooms to each task; pick a task above to switch.</p>
-    <svg id="robo-bars" class="robo-bars" viewBox="0 0 440 340" role="img"></svg>
+    <p class="plot-sub">Mean &plusmn; std; axis zoomed per task.</p>
+    <svg id="robo-bars" class="robo-bars" viewBox="0 0 440 250" role="img"></svg>
   </div>
   <div class="maze-grid robo-grid">
     <figure class="maze-steer">
@@ -978,7 +981,7 @@
       }
       function drawBars(i) {
         while (bars.firstChild) bars.removeChild(bars.firstChild);
-        var W = 440, H = 340, L = 48, R = 8, T = 26, B = 40;
+        var W = 440, H = 250, L = 48, R = 8, T = 22, B = 30;
         var lo = Math.min.apply(null, RESULTS.map(function (r) { return r.m[i] - r.s[i]; }));
         var hi = Math.max.apply(null, RESULTS.map(function (r) { return r.m[i] + r.s[i]; }));
         var span = hi - lo;
@@ -1004,7 +1007,7 @@
           sv(bars, 'line', { x1: cx - 6, x2: cx + 6, y1: ea, y2: ea, stroke: ec, 'stroke-width': 1.5 });
           sv(bars, 'line', { x1: cx - 6, x2: cx + 6, y1: eb, y2: eb, stroke: ec, 'stroke-width': 1.5 });
           sv(bars, 'text', { class: 'bar-val' + (r.steer ? ' steer' : ''), x: cx, y: ea - 7, 'text-anchor': 'middle' }, r.m[i].toFixed(1));
-          sv(bars, 'text', { class: 'bar-name' + (r.steer ? ' steer' : ''), x: cx, y: H - B + 22, 'text-anchor': 'middle' }, r.name);
+          sv(bars, 'text', { class: 'bar-name' + (r.steer ? ' steer' : ''), x: cx, y: H - B + 19, 'text-anchor': 'middle' }, r.name);
         });
         barTask.textContent = TASKS[i].name;
         bars.setAttribute('aria-label', 'Robomimic ' + TASKS[i].name + ' success rate: ' +
