@@ -152,8 +152,9 @@
   }
 
   /* ---------- Section headings ---------- */
-  /* Headings share the title band's navy. */
+  /* Headings on light backgrounds share the title band's navy; the dark control band overrides this. */
   h2.section-title, h3.sub-title, .plot-card h3 { color: #1e2846; }
+  .band-control h2.section-title, .band-control h3.sub-title { color: #f3f1f8; }
   h2.section-title {
     font-size: 30px;
     font-weight: 700;
@@ -402,19 +403,28 @@
   .plot-card svg .series { transition: opacity 0.25s ease; }
   .plot-card svg .pt-label { font-size: 12.5px; font-weight: 600; fill: var(--text); }
 
-  /* ---------- Continuous control (same cream as the sections above) ---------- */
+  /* ---------- Continuous control (dark muted blue-purple band) ---------- */
   .band-control {
-    display: flow-root;
-    background: #fcf9f2;
+    background: #2c2b45;
+    color: #f3f1f8;
+    border-top: 1px solid rgba(30, 45, 70, 0.18);
   }
-  .band-control .container { padding-top: 0; }
+  .band-control .container { padding-top: 56px; }
   .band-control h2.section-title { margin-top: 0; }
+  .band-control .section-intro { color: rgba(243, 241, 248, 0.82); }
   .band-control h3.sub-title {
     font-size: 22px;
     font-weight: 700;
     line-height: 1.3;
     margin: 32px 0 12px;
   }
+  .band-control .maze-grid figure {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+  .band-control .maze-grid figure.maze-steer { border-color: var(--steer); }
+  .band-control .robo-grid h3 { color: #f3f1f8; }
+  .band-control .robo-grid h3.split-steer { color: #e08a7e; }
 
   /* Rows: No Swaps vs STEER; columns: prompts. */
   .sd-grid {
@@ -505,14 +515,14 @@
     min-width: 132px;
     padding: 10px 22px;
     font-weight: 600;
-    border: 2px solid rgba(30, 40, 70, 0.3);
-    background: #fff;
-    color: #1e2846;
+    border: 2px solid rgba(243, 241, 248, 0.45);
+    background: rgba(255, 255, 255, 0.08);
+    color: #f3f1f8;
   }
   .ticks.robo-tabs button:hover {
-    color: #1e2846;
-    border-color: #1e2846;
-    background: #fff;
+    color: #fff;
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.16);
   }
   .ticks.robo-tabs button.active {
     background: var(--steer);
@@ -535,8 +545,8 @@
     margin-left: 6px;
     vertical-align: 2px;
   }
-  .robo-outcome.success { background: rgba(60, 140, 80, 0.12); color: #2f7a45; }
-  .robo-outcome.fail { background: rgba(181, 82, 74, 0.12); color: #a2453d; }
+  .robo-outcome.success { background: rgba(120, 200, 140, 0.18); color: #9fdcae; }
+  .robo-outcome.fail { background: rgba(224, 138, 126, 0.18); color: #f0a497; }
 
   /* ---------- Maze planning ---------- */
   .maze-grid {
