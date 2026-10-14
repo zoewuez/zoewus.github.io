@@ -476,14 +476,15 @@
   .robo-grid h3.split-steer { color: var(--steer); }
 
   .maze-grid.robo-grid video { aspect-ratio: auto; }
-  .maze-grid.robo-grid { max-width: 760px; margin: 0 auto; gap: 16px; }
+  .maze-grid.robo-grid { gap: 14px; }
   .maze-grid.robo-grid figure { padding: 8px; border-radius: 14px; }
 
-  /* Robomimic results table: white card below the videos, column synced with the task tabs. */
-  .band-control .plot-card.robo-card { color: var(--text); max-width: 760px; margin: 20px auto 0; }
+  /* Robomimic: results table on the left, videos on the right; table column synced with the task tabs. */
+  .robo-row { display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px; align-items: center; }
+  .band-control .plot-card.robo-card { color: var(--text); }
   .robo-table-wrap { overflow-x: auto; }
-  .robo-table { width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
-  .robo-table th, .robo-table td { padding: 8px 10px; text-align: center; white-space: nowrap; }
+  .robo-table { width: 100%; border-collapse: collapse; font-size: 14.5px; line-height: 1.3; font-variant-numeric: tabular-nums; }
+  .robo-table th, .robo-table td { padding: 7px 6px; text-align: center; white-space: nowrap; }
   .robo-table tbody th, .robo-table thead th:first-child { text-align: left; font-weight: 600; }
   .robo-table thead th { border-bottom: 1.5px solid #c3c2b7; font-weight: 700; }
   .robo-table thead button { background: none; border: none; padding: 2px 6px; border-radius: 999px; font: inherit; color: inherit; cursor: pointer; }
@@ -491,7 +492,7 @@
   .robo-table tbody tr + tr th, .robo-table tbody tr + tr td { border-top: 1px solid #efeee9; }
   .robo-table tr.steer-row th, .robo-table tr.steer-row td { border-top: 1.5px solid #c3c2b7; color: var(--steer); }
   .robo-table td.best { font-weight: 700; }
-  .robo-table .pm { color: var(--muted); font-size: 13px; }
+  .robo-table .pm { display: block; color: var(--muted); font-size: 11.5px; font-weight: 400; }
   .robo-table tr.steer-row .pm { color: inherit; opacity: 0.75; }
   .robo-table .sel { background: rgba(181, 82, 74, 0.08); }
   .robo-table thead .sel button { color: var(--red); }
@@ -607,7 +608,9 @@
     .sd-label { font-size: 11px; }
     .sd-grid a { border-width: 2px; border-radius: 6px; }
     .maze-grid { grid-template-columns: 1fr; gap: 14px; }
-    .maze-row { grid-template-columns: 1fr; }
+    .maze-row, .robo-row { grid-template-columns: 1fr; }
+    .robo-row .robo-grid { order: -1; }
+    .maze-grid.robo-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
     .maze-grid.maze-videos { grid-template-columns: 1fr 1fr; gap: 8px; }
     .maze-grid.maze-videos video { aspect-ratio: 4 / 3; height: auto; }
     h1.project { font-size: 34px; width: auto; margin: 0 0 22px; white-space: normal; }
@@ -902,6 +905,12 @@
   <!-- ============ ROBOMIMIC ============ -->
   <h3 class="sub-title">STEER improves imitation learning success without any verifier or reward signal</h3>
   <div class="ticks robo-tabs" id="robo-tabs" role="tablist" aria-label="Robomimic task"></div>
+  <div class="robo-row">
+  <div class="plot-card robo-card">
+    <h3>Robomimic success rate (%)</h3>
+    <p class="plot-sub">Mean &plusmn; std; best per task in bold. The highlighted column is the task in the videos; click a column to switch.</p>
+    <div class="robo-table-wrap"><table class="robo-table" id="robo-table"></table></div>
+  </div>
   <div class="maze-grid robo-grid">
     <figure class="maze-steer">
       <h3 class="split-steer">STEER <span class="robo-outcome" id="robo-steer-outcome"></span></h3>
@@ -912,10 +921,6 @@
       <video id="robo-base" autoplay muted loop playsinline></video>
     </figure>
   </div>
-  <div class="plot-card robo-card">
-    <h3>Robomimic success rate (%)</h3>
-    <p class="plot-sub">Mean &plusmn; std; best per task in bold. The highlighted column is the task shown above; click a column to switch.</p>
-    <div class="robo-table-wrap"><table class="robo-table" id="robo-table"></table></div>
   </div>
   <script>
     (function () {
@@ -941,7 +946,7 @@
       RESULTS.forEach(function (r) {
         html += '<tr' + (r.steer ? ' class="steer-row"' : '') + '><th>' + r.name + '</th>' + r.m.map(function (v, j) {
           var best = RESULTS.every(function (o) { return o.m[j] <= v; });
-          return '<td data-col="' + j + '"' + (best ? ' class="best"' : '') + '>' + v.toFixed(1) + '<span class="pm"> &plusmn; ' + r.s[j].toFixed(1) + '</span></td>';
+          return '<td data-col="' + j + '"' + (best ? ' class="best"' : '') + '>' + v.toFixed(1) + '<span class="pm">&plusmn; ' + r.s[j].toFixed(1) + '</span></td>';
         }).join('') + '</tr>';
       });
       table.innerHTML = html + '</tbody>';
