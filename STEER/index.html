@@ -501,20 +501,13 @@
   /* Robomimic: results table on the left, videos on the right; table column synced with the task tabs. */
   .robo-row { display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px; align-items: center; }
   .band-control .plot-card.robo-card { color: var(--text); }
-  .robo-table-wrap { overflow-x: auto; }
-  .robo-table { width: 100%; border-collapse: collapse; font-size: 14.5px; line-height: 1.3; font-variant-numeric: tabular-nums; }
-  .robo-table th, .robo-table td { padding: 7px 6px; text-align: center; white-space: nowrap; }
-  .robo-table tbody th, .robo-table thead th:first-child { text-align: left; font-weight: 600; }
-  .robo-table thead th { border-bottom: 1.5px solid #c3c2b7; font-weight: 700; }
-  .robo-table thead button { background: none; border: none; padding: 2px 6px; border-radius: 999px; font: inherit; color: inherit; cursor: pointer; }
-  .robo-table thead button:hover { color: var(--red); }
-  .robo-table tbody tr + tr th, .robo-table tbody tr + tr td { border-top: 1px solid #efeee9; }
-  .robo-table tr.steer-row th, .robo-table tr.steer-row td { border-top: 1.5px solid #c3c2b7; color: var(--steer); }
-  .robo-table td.best { font-weight: 700; }
-  .robo-table .pm { display: block; color: var(--muted); font-size: 11.5px; font-weight: 400; }
-  .robo-table tr.steer-row .pm { color: inherit; opacity: 0.75; }
-  .robo-table .sel { background: rgba(181, 82, 74, 0.08); }
-  .robo-table thead .sel button { color: var(--red); }
+  #robo-bar-task { color: var(--steer); }
+  .robo-bars .bar { transform-box: fill-box; transform-origin: 50% 100%; animation: bar-grow 0.45s ease-out both; }
+  @keyframes bar-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  .plot-card svg .bar-val { fill: var(--text); font-size: 14px; font-weight: 700; }
+  .plot-card svg .bar-val.steer { fill: var(--steer); }
+  .plot-card svg .bar-name { fill: var(--text); font-size: 14px; font-weight: 600; }
+  .plot-card svg .bar-name.steer { fill: var(--steer); font-weight: 700; }
 
   .robo-tabs {
     justify-content: center;
@@ -939,9 +932,9 @@
   <div class="ticks robo-tabs" id="robo-tabs" role="tablist" aria-label="Robomimic task"></div>
   <div class="robo-row">
   <div class="plot-card robo-card">
-    <h3>Robomimic success rate (%)</h3>
-    <p class="plot-sub">Mean &plusmn; std; best per task in bold. The highlighted column is the task in the videos; click a column to switch.</p>
-    <div class="robo-table-wrap"><table class="robo-table" id="robo-table"></table></div>
+    <h3>Success rate on <span id="robo-bar-task">Square</span></h3>
+    <p class="plot-sub">Mean &plusmn; std. The axis zooms to each task; pick a task above to switch.</p>
+    <svg id="robo-bars" class="robo-bars" viewBox="0 0 440 340" role="img"></svg>
   </div>
   <div class="maze-grid robo-grid">
     <figure class="maze-steer">
@@ -971,20 +964,52 @@
         { name: 'No Swaps', m: [86.4, 44.0, 50.8, 99.2], s: [2.8, 3.0, 2.9, 0.5] },
         { name: 'STEER',    m: [89.6, 46.4, 54.0, 99.2], s: [2.3, 2.9, 3.0, 0.5], steer: true }
       ];
-      var table = document.getElementById('robo-table');
-      var html = '<thead><tr><th>Method</th>' + TASKS.map(function (t, j) {
-        return '<th data-col="' + j + '"><button type="button">' + t.name + '</button></th>';
-      }).join('') + '</tr></thead><tbody>';
-      RESULTS.forEach(function (r) {
-        html += '<tr' + (r.steer ? ' class="steer-row"' : '') + '><th>' + r.name + '</th>' + r.m.map(function (v, j) {
-          var best = RESULTS.every(function (o) { return o.m[j] <= v; });
-          return '<td data-col="' + j + '"' + (best ? ' class="best"' : '') + '>' + v.toFixed(1) + '<span class="pm">&plusmn; ' + r.s[j].toFixed(1) + '</span></td>';
-        }).join('') + '</tr>';
-      });
-      table.innerHTML = html + '</tbody>';
-      table.querySelectorAll('thead button').forEach(function (b, j) {
-        b.addEventListener('click', function () { show(j); });
-      });
+      // Bar chart for the selected task. The y-axis starts near the lowest error bar (not at 0),
+      // since every method is within a few points of the others; value labels carry the exact numbers.
+      var NS = 'http://www.w3.org/2000/svg';
+      var bars = document.getElementById('robo-bars');
+      var barTask = document.getElementById('robo-bar-task');
+      function sv(parent, tag, attrs, text) {
+        var e = document.createElementNS(NS, tag);
+        for (var k in attrs) e.setAttribute(k, attrs[k]);
+        if (text != null) e.textContent = text;
+        parent.appendChild(e);
+        return e;
+      }
+      function drawBars(i) {
+        while (bars.firstChild) bars.removeChild(bars.firstChild);
+        var W = 440, H = 340, L = 48, R = 8, T = 26, B = 40;
+        var lo = Math.min.apply(null, RESULTS.map(function (r) { return r.m[i] - r.s[i]; }));
+        var hi = Math.max.apply(null, RESULTS.map(function (r) { return r.m[i] + r.s[i]; }));
+        var span = hi - lo;
+        var step = span <= 3 ? 0.5 : span <= 8 ? 1 : span <= 16 ? 2 : 5;
+        var y0 = Math.floor((lo - step) / step) * step;
+        var y1 = Math.min(100, Math.ceil((hi + step / 2) / step) * step);
+        var sy = function (v) { return H - B - (v - y0) / (y1 - y0) * (H - T - B); };
+        for (var v = y0; v <= y1 + 1e-9; v += step) {
+          sv(bars, 'line', { class: 'grid', x1: L, x2: W - R, y1: sy(v), y2: sy(v) });
+          sv(bars, 'text', { x: L - 8, y: sy(v) + 4, 'text-anchor': 'end' }, (step < 1 ? v.toFixed(1) : v) + '%');
+        }
+        sv(bars, 'line', { class: 'axis', x1: L, x2: W - R, y1: H - B, y2: H - B });
+        var band = (W - L - R) / RESULTS.length, bw = band * 0.6;
+        RESULTS.forEach(function (r, k) {
+          var cx = L + band * (k + 0.5), top = sy(r.m[i]);
+          var fill = r.steer ? '#b5524a' : '#cfcac4';
+          var rect = sv(bars, 'rect', { class: 'bar', x: cx - bw / 2, y: top, width: bw, height: H - B - top, rx: 4, fill: fill });
+          rect.style.animationDelay = (k * 0.05) + 's';
+          sv(rect, 'title', {}, r.name + ', ' + TASKS[i].name + ': ' + r.m[i].toFixed(1) + '% \u00b1 ' + r.s[i].toFixed(1));
+          var ea = sy(Math.min(100, r.m[i] + r.s[i])), eb = sy(r.m[i] - r.s[i]);
+          var ec = r.steer ? '#7a2f29' : '#6f6a64';
+          sv(bars, 'line', { x1: cx, x2: cx, y1: ea, y2: eb, stroke: ec, 'stroke-width': 1.5 });
+          sv(bars, 'line', { x1: cx - 6, x2: cx + 6, y1: ea, y2: ea, stroke: ec, 'stroke-width': 1.5 });
+          sv(bars, 'line', { x1: cx - 6, x2: cx + 6, y1: eb, y2: eb, stroke: ec, 'stroke-width': 1.5 });
+          sv(bars, 'text', { class: 'bar-val' + (r.steer ? ' steer' : ''), x: cx, y: ea - 7, 'text-anchor': 'middle' }, r.m[i].toFixed(1));
+          sv(bars, 'text', { class: 'bar-name' + (r.steer ? ' steer' : ''), x: cx, y: H - B + 22, 'text-anchor': 'middle' }, r.name);
+        });
+        barTask.textContent = TASKS[i].name;
+        bars.setAttribute('aria-label', 'Robomimic ' + TASKS[i].name + ' success rate: ' +
+          RESULTS.map(function (r) { return r.name + ' ' + r.m[i].toFixed(1) + '%'; }).join(', '));
+      }
       var tabs = document.getElementById('robo-tabs');
       var vs = document.getElementById('robo-steer'), vb = document.getElementById('robo-base');
       var os = document.getElementById('robo-steer-outcome'), ob = document.getElementById('robo-base-outcome');
@@ -1003,9 +1028,7 @@
           b.classList.toggle('active', j === i);
           b.setAttribute('aria-selected', j === i);
         });
-        table.querySelectorAll('[data-col]').forEach(function (c) {
-          c.classList.toggle('sel', +c.getAttribute('data-col') === i);
-        });
+        drawBars(i);
       }
       TASKS.forEach(function (t, i) {
         var b = document.createElement('button');
