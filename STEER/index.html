@@ -402,7 +402,7 @@
   .maze-legend button.dim { opacity: 0.4; }
   .maze-legend button.steer-key { color: var(--text); font-weight: 700; }
   .plot-card svg .series { transition: opacity 0.25s ease; }
-  .plot-card svg .pt-label { font-size: 12.5px; font-weight: 600; fill: var(--text); }
+  .plot-card svg .pt-label { font-size: 12.5px; font-weight: 600; fill: var(--text); stroke: #fff; stroke-width: 4px; stroke-linejoin: round; paint-order: stroke; }
 
   /* ---------- Per-sample fidelity: SD + protein (dark red band) ---------- */
   .band-fidelity {
@@ -1320,7 +1320,7 @@
       return name + ', \u03bb ' + P_LAMBDAS[k].toFixed(1) + ': designability ' +
         (PROT[m].pass[k] / 780 * 100).toFixed(1) + '%, FID ' + (PROT[m].fid[k] / 1e6).toFixed(3) + '\u00d710\u2076';
     };
-    // Least-squares trendline of FID on designability, drawn across each method's own x range.
+    // Least-squares trendline of FID on designability, spanning the whole plot (clipped to the y range).
     function trend(m) {
       var xs = PROT[m].pass.map(function (n) { return n / 780 * 100; });
       var ys = PROT[m].fid.map(function (f) { return f / 1e6; });
@@ -1328,8 +1328,13 @@
       xs.forEach(function (x, i) { mx += x / n; my += ys[i] / n; });
       xs.forEach(function (x, i) { sxy += (x - mx) * (ys[i] - my); sxx += (x - mx) * (x - mx); });
       var b = sxy / sxx, a = my - b * mx;
-      var x0 = Math.min.apply(null, xs) - 1, x1 = Math.max.apply(null, xs) + 1;
-      return [[pr.sx(x0), pr.sy(a + b * x0)], [pr.sx(x1), pr.sy(a + b * x1)]];
+      var X0 = 26, X1 = 46, Y0 = 4.5, Y1 = 5.3;
+      var clip = function (x) {
+        var y = a + b * x;
+        if (y < Y0) x = (Y0 - a) / b; else if (y > Y1) x = (Y1 - a) / b;
+        return [pr.sx(x), pr.sy(a + b * x)];
+      };
+      return [clip(X0), clip(X1)];
     }
     var base = prPts('tsr');
     path(g, trend('tsr'), { stroke: GRAY, 'stroke-width': 2.5, 'stroke-dasharray': '6 4' });
