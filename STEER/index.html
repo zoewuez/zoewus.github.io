@@ -60,11 +60,11 @@
     background: #1e2846;
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
   }
-  .band-header h1.project { color: #fff; }
+  .band-header h1.project { color: #fcf9f2; }
   .band-header .meta,
-  .band-header .affiliation { color: rgba(255, 255, 255, 0.8); }
-  .band-header .back { color: #1e2846; background: #fff; }
-  .band-header .resource { color: #1e2846; border-color: transparent; }
+  .band-header .affiliation { color: rgba(252, 249, 242, 0.8); }
+  .band-header .back { color: #1e2846; background: #fcf9f2; }
+  .band-header .resource { color: #1e2846; background: #fcf9f2; border-color: transparent; }
   .band-header .resource:hover { color: var(--red); }
   .container.header { padding-bottom: 48px; }
   .container.header .title-block { margin-bottom: 0; }
@@ -152,6 +152,9 @@
   }
 
   /* ---------- Section headings ---------- */
+  /* Headings on light backgrounds share the title band's navy; the dark control band overrides this. */
+  h2.section-title, h3.sub-title, .plot-card h3 { color: #1e2846; }
+  .band-control h2.section-title, .band-control h3.sub-title { color: #f3f1f8; }
   h2.section-title {
     font-size: 30px;
     font-weight: 700;
