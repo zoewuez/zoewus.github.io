@@ -352,6 +352,17 @@
   .plot-card svg .curve:focus-visible .hit { stroke: rgba(74, 109, 156, 0.18); }
   .plot-card svg .curve-label { font-size: 13px; font-weight: 700; fill: var(--text); }
 
+  /* Protein backbone plot: its own centered card below the SD row. */
+  .sub-title.protein-title {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 44px 0 16px;
+  }
+  .sub-title.protein-title em { font-style: italic; }
+  .protein-card { max-width: 640px; margin: 0 auto; }
+  .plot-card svg .pt-label { font-size: 12.5px; font-weight: 600; fill: var(--text); }
+
   /* ---------- Continuous control (dark muted blue-purple band) ---------- */
   .band-control {
     background: #2c2b45;
@@ -772,6 +783,19 @@
 
   </div>
 
+  <!-- ============ PROTEIN BACKBONE GENERATION ============ -->
+  <h3 class="sub-title protein-title">Each point is a temperature <em>&lambda;</em> on protein backbone generation; STEER shifts the fidelity&ndash;designability trendline favorably.</h3>
+  <div class="plot-card protein-card">
+    <h3>Protein generation</h3>
+    <p class="plot-sub">FID vs. designability across &lambda;; down and right is better.</p>
+    <svg id="protein-plot" viewBox="0 0 560 380" role="img" aria-label="FID versus designability for single chain and STEER on protein backbone generation"></svg>
+    <div class="plot-legend">
+      <span><i class="dash" style="border-color:#9a9a9a"></i>Single chain</span>
+      <span><i style="border-color:var(--red)"></i>STEER</span>
+      <span id="protein-lambda-legend"></span>
+    </div>
+  </div>
+
 </div>
 </div>
 
@@ -970,7 +994,7 @@
 
   // Draws gridlines, ticks and axis labels; returns x/y scale functions.
   function axes(svg, o) {
-    var W = 420, H = 445, L = 56, R = 14, T = 12, B = 48;
+    var W = o.W || 420, H = o.H || 445, L = o.L || 56, R = 14, T = 12, B = 48;
     var sx = function (v) { return L + (v - o.x[0]) / (o.x[1] - o.x[0]) * (W - L - R); };
     var sy = function (v) { return H - B - (v - o.y[0]) / (o.y[1] - o.y[0]) * (H - T - B); };
     o.xt.forEach(function (v) {
@@ -1092,6 +1116,56 @@
   var lamIdx = +document.getElementById('lambda').value;
   document.addEventListener('lambdachange', function (e) { lamIdx = e.detail; drawSD(); });
   drawSD();
+
+  /* ---------------- Protein backbone generation: FID vs. designability ---------------- */
+  // Designability = % of 780 samples passing the scTM cutoff; FID shown in units of 10^6.
+  var P_LAMBDAS = [0.5, 0.6, 0.7, 0.8, 0.9];
+  var pColor = function (l) { return lerpHex('#4a6d9c', '#b5524a', (l - 0.5) / 0.4); };
+  var PROT = {
+    tsr:   { pass: [333, 320, 285, 256, 219], fid: [5233097.0, 4955688.0, 4807765.5, 4609404.5, 4667145.5] },
+    steer: { pass: [336, 282, 254, 249, 241], fid: [4956776.5, 4724687.0, 4740686.0, 4676160.0, 4789692.0] }
+  };
+  var pr = axes(document.getElementById('protein-plot'), {
+    W: 560, H: 380, L: 60,
+    x: [26, 46], y: [4.5, 5.3],
+    xt: [26, 30, 34, 38, 42, 46], yt: [4.5, 4.6, 4.7, 4.8, 4.9, 5.0, 5.1, 5.2, 5.3],
+    xf: function (v) { return v + '%'; }, yf: function (v) { return v.toFixed(1); },
+    xl: 'Designability (\u2191 better)', yl: 'FID \u00d7 10\u2076 (\u2193 better)'
+  });
+  var prPts = function (m) {
+    return PROT[m].pass.map(function (n, i) { return [pr.sx(n / 780 * 100), pr.sy(PROT[m].fid[i] / 1e6)]; });
+  };
+  document.getElementById('protein-lambda-legend').innerHTML = P_LAMBDAS.map(function (l) {
+    return '<i class="dot" style="background:' + pColor(l) + '"></i>';
+  }).join('') + '&nbsp;&lambda; 0.5 &rarr; 0.9';
+
+  (function () {
+    var g = pr.layer;
+    var tip = function (name, m, k) {
+      return name + ', \u03bb ' + P_LAMBDAS[k].toFixed(1) + ': designability ' +
+        (PROT[m].pass[k] / 780 * 100).toFixed(1) + '%, FID ' + (PROT[m].fid[k] / 1e6).toFixed(3) + '\u00d710\u2076';
+    };
+    var base = prPts('tsr');
+    path(g, base, { stroke: GRAY, 'stroke-width': 2, 'stroke-dasharray': '6 4' });
+    base.forEach(function (p, k) {
+      var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 5, fill: '#d6d6d6', stroke: GRAY, 'stroke-width': 1 });
+      el(c, 'title', {}, tip('Single chain', 'tsr', k));
+    });
+    var pts = prPts('steer');
+    for (var k = 0; k < pts.length - 1; k++) {
+      path(g, [pts[k], pts[k + 1]], { stroke: pColor((P_LAMBDAS[k] + P_LAMBDAS[k + 1]) / 2), 'stroke-width': 3.5 });
+    }
+    pts.forEach(function (p, k) {
+      var c = el(g, 'circle', { cx: p[0], cy: p[1], r: 6, fill: pColor(P_LAMBDAS[k]), stroke: '#0b0b0b', 'stroke-width': 1 });
+      el(c, 'title', {}, tip('STEER', 'steer', k));
+    });
+    // Label the sweep endpoints on both curves: λ 0.5 sits at the right end, λ 0.9 at the left.
+    [base, pts].forEach(function (c) {
+      var first = c[0], last = c[c.length - 1];
+      el(g, 'text', { class: 'pt-label', x: first[0] + 11, y: first[1] + 4.5 }, '\u03bb 0.5');
+      el(g, 'text', { class: 'pt-label', x: last[0] - 11, y: last[1] + 4.5, 'text-anchor': 'end' }, '\u03bb 0.9');
+    });
+  })();
 
 })();
 </script>
