@@ -955,7 +955,7 @@
         { name: 'Square',    dir: 'square',    steer: '1_steer_seed50_ep13_success.mp4',   base: '2_baseline_seed50_ep13_fail.mp4' },
         { name: 'Tool Hang', dir: 'tool_hang', steer: '1_steer_seed150_ep00_success.mp4',  base: '2_baseline_seed150_ep00_fail.mp4' },
         { name: 'Can',       dir: 'can',       steer: '1_steer_seed100_ep02_success.mp4',  base: '2_baseline_seed100_ep02_success.mp4' },
-        { name: 'Lift',      dir: 'lift',      steer: '1_steer_seed50_ep00_success.mp4',   base: '2_baseline_seed50_ep00_success.mp4' }
+        { name: 'Lift',      dir: 'lift',      steer: '1_steer_seed50_ep00_success.mp4',   base: '2_baseline_seed50_ep00_success.mp4', y0: 95 }
       ];
       // Success rate (%), mean and std per task, in TASKS order.
       var RESULTS = [
@@ -981,10 +981,11 @@
         while (bars.firstChild) bars.removeChild(bars.firstChild);
         var W = 440, H = 250, L = 48, R = 8, T = 22, B = 30;
         var lo = Math.min.apply(null, RESULTS.map(function (r) { return r.m[i] - r.s[i]; }));
+        if (TASKS[i].y0 != null) lo = Math.min(lo, TASKS[i].y0);
         var hi = Math.max.apply(null, RESULTS.map(function (r) { return r.m[i] + r.s[i]; }));
         var span = hi - lo;
         var step = span <= 3 ? 0.5 : span <= 8 ? 1 : span <= 16 ? 2 : 5;
-        var y0 = Math.floor((lo - step) / step) * step;
+        var y0 = TASKS[i].y0 != null ? TASKS[i].y0 : Math.floor((lo - step) / step) * step;
         var y1 = Math.min(100, Math.ceil((hi + step / 2) / step) * step);
         var sy = function (v) { return H - B - (v - y0) / (y1 - y0) * (H - T - B); };
         for (var v = y0; v <= y1 + 1e-9; v += step) {
