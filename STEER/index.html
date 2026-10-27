@@ -624,29 +624,13 @@
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 
-  /* ---------- Single prompt: typewriter text box, then samples ---------- */
+  /* ---------- Single prompt: one prompt, No Swaps vs. Swaps samples ---------- */
   .section-intro.prompt-intro { margin: 28px 0 14px; }
-  .prompt-box {
-    display: flex; align-items: center;
-    min-height: 52px; padding: 10px 10px 10px 18px; margin-bottom: 14px;
-    border: 1px solid var(--border); border-radius: 999px; background: #faf8f6;
-    font-size: 18px; color: var(--text);
+  .prompt-line { margin: 0 0 12px; font-size: 18px; color: var(--text); }
+  .prompt-line span {
+    margin-right: 8px; font-size: 13px; font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--muted);
   }
-  .prompt-text { white-space: pre-wrap; }
-  .prompt-caret {
-    display: inline-block; width: 2px; height: 1.2em; margin-left: 2px;
-    background: var(--text); animation: caret 1s steps(1) infinite;
-  }
-  @keyframes caret { 50% { opacity: 0; } }
-  .prompt-go {
-    margin-left: auto; flex: none; width: 34px; height: 34px; border-radius: 50%;
-    border: none; background: var(--red); color: #fff; font-size: 18px; line-height: 1;
-    cursor: pointer; transition: transform 0.15s ease, opacity 0.2s ease;
-  }
-  .prompt-go:hover { transform: scale(1.08); }
-  .prompt-go:disabled { opacity: 0.4; cursor: default; transform: none; }
-  .prompt-grid a { opacity: 0; transform: translateY(8px); transition: opacity 0.5s ease, transform 0.5s ease; }
-  .prompt-grid a.shown { opacity: 1; transform: none; }
 
   /* ---------- Responsive ---------- */
   @media (max-width: 720px) {
@@ -654,7 +638,7 @@
     .sd-grid { grid-template-columns: 16px repeat(3, 1fr); gap: 5px; }
     .sd-label { font-size: 11px; }
     .sd-grid a { border-width: 2px; border-radius: 6px; }
-    .prompt-box { font-size: 15px; }
+    .prompt-line { font-size: 15px; }
     .maze-grid { grid-template-columns: 1fr; gap: 14px; }
     .maze-row, .robo-row, .protein-row { grid-template-columns: 1fr; }
     .robo-row .robo-grid { order: -1; }
@@ -893,16 +877,13 @@
 
   </div>
 
-  <!-- ============ SINGLE PROMPT: typed prompt, then samples ============ -->
+  <!-- ============ SINGLE PROMPT: No Swaps vs. Swaps samples ============ -->
   <p class="section-intro prompt-intro">
     With the same prompt and seeds, replica exchange yields more diverse samples: scenes with more
     people, more fine-grained detail, and fewer artifacts than sampling without swaps.
   </p>
-  <div class="plot-card prompt-card" id="prompt-demo">
-    <div class="prompt-box">
-      <span class="prompt-text" id="prompt-text"></span><span class="prompt-caret"></span>
-      <button type="button" class="prompt-go" id="prompt-go" aria-label="Replay">&#8635;</button>
-    </div>
+  <div class="plot-card prompt-card">
+    <p class="prompt-line"><span>Prompt</span>&ldquo;A man riding a bicycle past a train.&rdquo;</p>
     <div class="sd-grid prompt-grid" id="prompt-grid">
       <div class="sd-label">No Swaps</div>
       <div class="sd-label steer">Swaps</div>
@@ -1217,17 +1198,11 @@
   slider.addEventListener('input', render);
   render();
 
-  // Single prompt: type the prompt when scrolled into view, then reveal No Swaps / Swaps samples.
+  // Single prompt: No Swaps / Swaps samples for one prompt across seeds.
   (function () {
     var PROMPT = 'A man riding a bicycle past a train.';
     var SEEDS = ['seed_2', 'seed_5', 'seed_14'];
-    var card = document.getElementById('prompt-demo');
-    var text = document.getElementById('prompt-text');
-    var go   = document.getElementById('prompt-go');
-    var pg   = document.getElementById('prompt-grid');
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    var links = [];
+    var pg = document.getElementById('prompt-grid');
     [{ method: 'tsr', label: 'No Swaps', after: pg.children[0] },
      { method: 'steer', label: 'Swaps', after: pg.children[1] }].forEach(function (r) {
       var ref = r.after.nextSibling;
@@ -1244,44 +1219,8 @@
         img.loading = 'lazy';
         a.appendChild(img);
         pg.insertBefore(a, ref);
-        links.push(a);
       });
     });
-
-    var timers = [];
-    function play() {
-      timers.forEach(clearTimeout);
-      timers = [];
-      go.disabled = true;
-      links.forEach(function (a) { a.classList.remove('shown'); });
-      if (reduce) {
-        text.textContent = PROMPT;
-        links.forEach(function (a) { a.classList.add('shown'); });
-        go.disabled = false;
-        return;
-      }
-      text.textContent = '';
-      var t = 300;
-      PROMPT.split('').forEach(function (ch, i) {
-        t += 35 + Math.random() * 45;
-        timers.push(setTimeout(function () { text.textContent = PROMPT.slice(0, i + 1); }, t));
-      });
-      t += 500;
-      links.forEach(function (a, i) {
-        timers.push(setTimeout(function () { a.classList.add('shown'); }, t + (i % SEEDS.length) * 120 + Math.floor(i / SEEDS.length) * 60));
-      });
-      timers.push(setTimeout(function () { go.disabled = false; }, t + 800));
-    }
-
-    go.addEventListener('click', play);
-    if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (es) {
-        if (es[0].isIntersecting) { io.disconnect(); play(); }
-      }, { threshold: 0.4 });
-      io.observe(card);
-    } else {
-      play();
-    }
   })();
 </script>
 
