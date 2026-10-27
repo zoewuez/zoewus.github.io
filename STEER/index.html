@@ -620,7 +620,7 @@
   }
 
   /* ---------- Single prompt: typewriter text box, then samples ---------- */
-  .prompt-card { margin-top: 20px; }
+  .section-intro.prompt-intro { margin: 28px 0 14px; }
   .prompt-box {
     display: flex; align-items: center;
     min-height: 52px; padding: 10px 10px 10px 18px; margin-bottom: 14px;
@@ -888,6 +888,10 @@
   </div>
 
   <!-- ============ SINGLE PROMPT: typed prompt, then samples ============ -->
+  <p class="section-intro prompt-intro">
+    With the same prompt and seeds, replica exchange yields more diverse samples: scenes with more
+    people, more fine-grained detail, and fewer artifacts than sampling without swaps.
+  </p>
   <div class="plot-card prompt-card" id="prompt-demo">
     <div class="prompt-box">
       <span class="prompt-text" id="prompt-text"></span><span class="prompt-caret"></span>
