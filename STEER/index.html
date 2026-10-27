@@ -626,6 +626,7 @@
 
   /* ---------- Single prompt: one prompt, No Swaps vs. Swaps samples ---------- */
   .section-intro.prompt-intro { margin: 28px 0 14px; }
+  .sd-grid.prompt-grid { grid-template-columns: 20px repeat(4, 1fr); }
   .prompt-line { margin: 0 0 12px; font-size: 18px; color: var(--text); }
   .prompt-line span {
     margin-right: 8px; font-size: 13px; font-weight: 700; letter-spacing: 0.04em;
@@ -639,6 +640,7 @@
     .sd-label { font-size: 11px; }
     .sd-grid a { border-width: 2px; border-radius: 6px; }
     .prompt-line { font-size: 15px; }
+    .sd-grid.prompt-grid { grid-template-columns: 16px repeat(4, 1fr); }
     .maze-grid { grid-template-columns: 1fr; gap: 14px; }
     .maze-row, .robo-row, .protein-row { grid-template-columns: 1fr; }
     .robo-row .robo-grid { order: -1; }
@@ -1201,7 +1203,7 @@
   // Single prompt: No Swaps / Swaps samples for one prompt across seeds.
   (function () {
     var PROMPT = 'A man riding a bicycle past a train.';
-    var SEEDS = ['seed_2', 'seed_5', 'seed_14'];
+    var SEEDS = ['seed_2', 'seed_5', 'seed_14', 'seed_180'];
     var pg = document.getElementById('prompt-grid');
     [{ method: 'tsr', label: 'No Swaps', after: pg.children[0] },
      { method: 'steer', label: 'Swaps', after: pg.children[1] }].forEach(function (r) {
