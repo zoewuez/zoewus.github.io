@@ -396,6 +396,12 @@
   .maze-grid.maze-videos figure { padding: 6px; border-radius: 12px; display: flex; min-height: 0; }
   .maze-grid.maze-videos video { border-radius: 7px; aspect-ratio: auto; height: 100%; min-height: 0; object-fit: contain; }
   .band-control .plot-card.maze-card { color: var(--text); }
+  /* Replica diversity: No Swaps / Swaps rows of maze rollouts. */
+  .band-control .plot-card.maze-div-card { color: var(--text); margin-top: 20px; }
+  .maze-div-grid { display: grid; grid-template-columns: 20px repeat(4, 1fr); gap: 10px; margin: 6px 0 4px; align-items: center; }
+  .maze-div-grid figure { margin: 0; overflow: hidden; border-radius: 10px; border: 3px solid var(--tsr); background: #0b1020; }
+  .maze-div-grid figure.steer { border-color: var(--steer); }
+  .maze-div-grid video { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; }
   .maze-legend button {
     display: inline-flex; align-items: center; gap: 6px;
     background: none; border: 1px solid transparent; border-radius: 999px;
@@ -656,6 +662,9 @@
     .maze-grid.robo-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
     .maze-grid.maze-videos { grid-template-columns: 1fr 1fr; gap: 8px; }
     .maze-grid.maze-videos video { aspect-ratio: 4 / 3; height: auto; }
+    .maze-div-grid { grid-template-columns: 16px repeat(2, 1fr); gap: 6px; }
+    .maze-div-grid .sd-label { grid-row: span 2; }
+    .maze-div-grid figure { border-width: 2px; border-radius: 6px; }
     h1.project { font-size: 34px; width: auto; margin: 0 0 22px; white-space: normal; }
   }
 </style>
@@ -967,6 +976,24 @@
     </figure>
   </div>
 
+  </div>
+
+  <!-- Replica diversity: four replicas per method on the same maze and seed. -->
+  <div class="plot-card maze-div-card">
+    <h3>Trajectories across replicas</h3>
+    <p class="plot-sub">Four of nine replicas per method on the same giant point maze and seed.</p>
+    <div class="maze-div-grid" id="maze-div-grid">
+      <div class="sd-label">No Swaps</div>
+      <figure><video src="../images/pointmaze_diversity/tsr/tsr_replica0.mp4" autoplay muted loop playsinline aria-label="No Swaps, replica 0 of 9"></video></figure>
+      <figure><video src="../images/pointmaze_diversity/tsr/tsr_replica5_selected.mp4" autoplay muted loop playsinline aria-label="No Swaps, replica 5 of 9, selected"></video></figure>
+      <figure><video src="../images/pointmaze_diversity/tsr/tsr_replica7.mp4" autoplay muted loop playsinline aria-label="No Swaps, replica 7 of 9"></video></figure>
+      <figure><video src="../images/pointmaze_diversity/tsr/tsr_replica8.mp4" autoplay muted loop playsinline aria-label="No Swaps, replica 8 of 9"></video></figure>
+      <div class="sd-label steer">Swaps</div>
+      <figure class="steer"><video src="../images/pointmaze_diversity/steer/steer_replica0.mp4" autoplay muted loop playsinline aria-label="Swaps, replica 0 of 9"></video></figure>
+      <figure class="steer"><video src="../images/pointmaze_diversity/steer/steer_replica5_selected.mp4" autoplay muted loop playsinline aria-label="Swaps, replica 5 of 9, selected"></video></figure>
+      <figure class="steer"><video src="../images/pointmaze_diversity/steer/steer_replica7.mp4" autoplay muted loop playsinline aria-label="Swaps, replica 7 of 9"></video></figure>
+      <figure class="steer"><video src="../images/pointmaze_diversity/steer/steer_replica8.mp4" autoplay muted loop playsinline aria-label="Swaps, replica 8 of 9"></video></figure>
+    </div>
   </div>
 
   <!-- ============ ROBOMIMIC ============ -->
