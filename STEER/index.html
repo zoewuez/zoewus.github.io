@@ -640,7 +640,6 @@
   }
   .prompt-go:hover { transform: scale(1.08); }
   .prompt-go:disabled { opacity: 0.4; cursor: default; transform: none; }
-  .sd-grid.prompt-grid { grid-template-columns: 20px repeat(4, 1fr); }
   .prompt-grid a { opacity: 0; transform: translateY(8px); transition: opacity 0.5s ease, transform 0.5s ease; }
   .prompt-grid a.shown { opacity: 1; transform: none; }
 
@@ -650,7 +649,6 @@
     .sd-grid { grid-template-columns: 16px repeat(3, 1fr); gap: 5px; }
     .sd-label { font-size: 11px; }
     .sd-grid a { border-width: 2px; border-radius: 6px; }
-    .sd-grid.prompt-grid { grid-template-columns: 16px repeat(4, 1fr); }
     .prompt-box { font-size: 15px; }
     .maze-grid { grid-template-columns: 1fr; gap: 14px; }
     .maze-row, .robo-row, .protein-row { grid-template-columns: 1fr; }
@@ -1194,8 +1192,8 @@
 
   // Single prompt: type the prompt when scrolled into view, then reveal No Swaps / Swaps samples.
   (function () {
-    var PROMPT = 'People riding bicycles down the road approaching a bird.';
-    var SEEDS = ['seed_3', 'seed_5', 'seed_6', 'seed_8'];
+    var PROMPT = 'A man riding a bicycle past a train.';
+    var SEEDS = ['seed_2', 'seed_5', 'seed_14'];
     var card = document.getElementById('prompt-demo');
     var text = document.getElementById('prompt-text');
     var go   = document.getElementById('prompt-go');
@@ -1208,13 +1206,13 @@
       var ref = r.after.nextSibling;
       SEEDS.forEach(function (s) {
         var a = document.createElement('a');
-        a.href = '../images/single_prompt/' + r.method + '/' + s + '.png';
+        a.href = '../images/train/' + r.method + '/' + s + '.png';
         a.target = '_blank';
         a.rel = 'noopener';
         a.title = 'Open full resolution';
         if (r.method === 'steer') a.className = 'steer';
         var img = document.createElement('img');
-        img.src = '../images/single_prompt_web/' + r.method + '/' + s + '.jpg';
+        img.src = '../images/train_web/' + r.method + '/' + s + '.jpg';
         img.alt = r.label + ' sample, ' + s.replace('_', ' ') + ': ' + PROMPT;
         img.loading = 'lazy';
         a.appendChild(img);
