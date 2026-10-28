@@ -863,7 +863,7 @@
     </div>
 
     <div class="plot-card sample-card">
-      <h3>Stable Diffusion samples</h3>
+      <h3>Flux samples</h3>
       <p class="plot-sub">No Swaps vs. STEER with 4 replicas, same prompts</p>
       <div class="sd-grid" id="sd-grid">
         <div class="sd-label">No Swaps</div>
@@ -873,7 +873,7 @@
         <label for="lambda">Temperature</label>
         <span class="val"><em>&lambda;</em> = <span id="lambda-out">0.95</span></span>
       </div>
-      <input type="range" id="lambda" min="0" max="4" step="1" value="0">
+      <input type="range" id="lambda" min="0" max="3" step="1" value="0">
       <div class="ticks" id="ticks"></div>
     </div>
 
@@ -1128,21 +1128,20 @@
 </div>
 
 <script>
-  // Folder suffix in images/steer_web/ uses the temperature with "." -> "_" (e.g. steer_1_1 = λ 1.1).
-  // Originals live in images/steer_tsr/ as e.g. "steer 11" for λ 1.1.
+  // Folder suffix in images/<web>/ uses the temperature with "." -> "_" (e.g. steer_1_05 = λ 1.05).
+  // Originals live in images/<src>/ as e.g. "steer 105" for λ 1.05.
   // Only temperatures where every scene has both a No Swaps (TSR) and STEER sample are listed.
-  // id = web .jpg name in steer_web/, orig = full-resolution .png name in steer_tsr/.
+  // id = web .jpg name in <web>/, orig = full-resolution .png name in <src>/.
   var SCENES = [
-    { id: 'skateboard_1176', orig: 'skateboard_1176',              name: 'skateboard' },
-    { id: 'coco_577864',     orig: 'COCO_val2014_000000577864',    name: 'COCO 577864' },
-    { id: 'coco_544',        orig: 'COCO_val2014_000000000544',    name: 'COCO 544' }
+    { id: 'skateboard_1176', orig: 'skateboard_1176',           name: 'skateboard', src: 'steer_tsr', web: 'steer_web' },
+    { id: 'coco_16961',      orig: 'COCO_val2014_000000016961', name: 'COCO 16961', src: 'flux',      web: 'flux_web' },
+    { id: 'coco_7072',       orig: 'COCO_val2014_000000007072', name: 'COCO 7072',  src: 'flux',      web: 'flux_web' }
   ];
   var TEMPS = [
     { lambda: '0.95', key: '0_95', orig: '095' },
     { lambda: '0.98', key: '0_98', orig: '098' },
     { lambda: '1.02', key: '1_02', orig: '102' },
-    { lambda: '1.05', key: '1_05', orig: '105' },
-    { lambda: '1.10', key: '1_1',  orig: '11' }
+    { lambda: '1.05', key: '1_05', orig: '105' }
   ];
 
   var slider = document.getElementById('lambda');
@@ -1190,8 +1189,8 @@
     });
     cells.forEach(function (row) {
       row.forEach(function (c) {
-        c.a.href = '../images/steer_tsr/' + encodeURIComponent(c.method + ' ' + t.orig) + '/' + c.scene.orig + '.png';
-        c.img.src = '../images/steer_web/' + c.method + '_' + t.key + '/' + c.scene.id + '.jpg';
+        c.a.href = '../images/' + c.scene.src + '/' + encodeURIComponent(c.method + ' ' + t.orig) + '/' + c.scene.orig + '.png';
+        c.img.src = '../images/' + c.scene.web + '/' + c.method + '_' + t.key + '/' + c.scene.id + '.jpg';
         c.img.alt = c.label + ' sample, ' + c.scene.name + ', lambda ' + t.lambda;
       });
     });
