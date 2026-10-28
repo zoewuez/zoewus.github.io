@@ -373,7 +373,7 @@
   .plot-card svg .curve-label { font-size: 13px; font-weight: 700; fill: var(--text); }
 
   /* Protein backbone plot: its own centered card below the SD row. */
-  /* Per-sample fidelity subsections: Stable Diffusion, then protein generation. */
+  /* Per-sample fidelity subsections: images, then protein generation. */
   .sub-title.fidelity-sub {
     font-size: 22px;
     font-weight: 700;
@@ -838,7 +838,7 @@
   <!-- ============ SAMPLES ============ -->
   <h2 class="section-title" id="per-sample-fidelity">STEER achieves a better fidelity&ndash;diversity trade-off</h2>
 
-  <h3 class="sub-title fidelity-sub">Stable Diffusion</h3>
+  <h3 class="sub-title fidelity-sub">Images</h3>
   <p class="section-intro">
     Lowering the temperature sharpens samples, but a single chain pushed to low temperature tends to
     lose semantic fidelity to the prompt. STEER exchanges samples with higher-temperature replicas,
@@ -1273,7 +1273,7 @@
     return 'rgb(' + pa.map(function (v, i) { return Math.round(v + (pb[i] - v) * t); }).join(',') + ')';
   }
 
-  /* ---------------- Stable Diffusion: slider over number of replicas ---------------- */
+  /* ---------------- Images: slider over number of replicas ---------------- */
   var LAMBDAS = [0.95, 0.98, 1.02, 1.05, 1.10];
   var lamColor = function (l) { return lerpHex('#4a6d9c', '#b5524a', (l - 0.95) / 0.15); };
   var SD = {
