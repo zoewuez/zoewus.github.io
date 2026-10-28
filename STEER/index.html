@@ -881,7 +881,7 @@
 
   <!-- ============ SINGLE PROMPT: No Swaps vs. Swaps samples ============ -->
   <p class="section-intro prompt-intro">
-    With the same prompt and seeds, replica exchange yields more diverse samples: more varied scenes,
+    With the same prompt, replica exchange yields more diverse samples: more varied scenes,
     more fine-grained detail, and fewer artifacts than sampling without swaps.
   </p>
   <div class="plot-card prompt-card">
@@ -1202,20 +1202,23 @@
   // Single prompt: No Swaps / Swaps samples for one prompt across seeds.
   (function () {
     var PROMPT = 'A man riding a bicycle past a train.';
-    var SEEDS = ['seed_2', 'seed_5', 'seed_14', 'seed_180'];
+    var SEEDS = {
+      tsr:   ['seed_4', 'seed_9', 'seed_15', 'seed_21'],
+      steer: ['seed_2', 'seed_18', 'seed_25', 'seed_28']
+    };
     var pg = document.getElementById('prompt-grid');
     [{ method: 'tsr', label: 'No Swaps', after: pg.children[0] },
      { method: 'steer', label: 'Swaps', after: pg.children[1] }].forEach(function (r) {
       var ref = r.after.nextSibling;
-      SEEDS.forEach(function (s) {
+      SEEDS[r.method].forEach(function (s) {
         var a = document.createElement('a');
-        a.href = '../images/train/' + r.method + '/' + s + '.png';
+        a.href = '../images/flux_single_prompt/' + r.method + '/' + s + '.png';
         a.target = '_blank';
         a.rel = 'noopener';
         a.title = 'Open full resolution';
         if (r.method === 'steer') a.className = 'steer';
         var img = document.createElement('img');
-        img.src = '../images/train_web/' + r.method + '/' + s + '.jpg';
+        img.src = '../images/flux_single_prompt_web/' + r.method + '/' + s + '.jpg';
         img.alt = r.label + ' sample, ' + s.replace('_', ' ') + ': ' + PROMPT;
         img.loading = 'lazy';
         a.appendChild(img);
